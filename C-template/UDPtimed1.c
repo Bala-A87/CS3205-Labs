@@ -7,8 +7,9 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <errno.h>
 
-extern int	errno;
+/* extern int	errno; */
 
 int	passiveUDP(const char *service);
 int	errexit(const char *format, ...);

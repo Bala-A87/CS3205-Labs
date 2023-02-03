@@ -9,13 +9,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <errno.h>
 
 #define	BUFSIZE 64
 
 #define	UNIXEPOCH	2208988800UL	/* UNIX epoch, in UCT secs	*/
 #define	MSG		"what time is it?\n"
 
-extern int	errno;
+/* extern int	errno; */
 int	errexit(const char *format, ...);
 
 int

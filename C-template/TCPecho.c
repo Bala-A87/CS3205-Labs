@@ -8,8 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
-extern int	errno;
+/* extern int	errno; */
 
 void	TCPecho(const char *host, const char *service);
 int	errexit(const char *format, ...);

@@ -17,11 +17,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #define	QLEN		  32	/* maximum connection queue length	*/
 #define	BUFSIZE		4096
 
-extern int	errno;
+/* extern int	errno; */
 
 void	reaper(int);
 int	TCPechod(int fd);

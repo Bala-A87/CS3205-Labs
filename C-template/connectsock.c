@@ -9,12 +9,15 @@
 #include <netdb.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifndef	INADDR_NONE
 #define	INADDR_NONE	0xffffffff
 #endif	/* INADDR_NONE */
 
-extern int	errno;
+#define h_addr h_addr_list[0]
+
+/* extern int	errno; */
 
 int	errexit(const char *format, ...);
 
