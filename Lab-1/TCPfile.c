@@ -109,5 +109,6 @@ TCPfile(const char *host, const char *service)
 		else
 			printf("%s\n", buf);
 		memset(buf, 0, sizeof(buf));
+		printf("\n");
 	}
 }

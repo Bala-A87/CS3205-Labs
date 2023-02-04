@@ -9,11 +9,10 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-/* #include <math.h> */
+#include <math.h>
 
 int	passiveUDP(const char *service);
 int	errexit(const char *format, ...);
-/* double sqrt(double __x); */
 
 int
 passivesock(const char *service, const char *transport, int qlen);
@@ -98,8 +97,7 @@ main(int argc, char *argv[])
 	  else if(!strcmp(op, "mod"))
 	    result = op1 % op2;
 	  else if(!strcmp(op, "hyp"))
-/* 		result = (int) sqrt(op1*op1 + op2*op2); */
-		result = op1*op1 + op2*op2;
+		result = (int) sqrt(op1*op1 + op2*op2);
 		/* Try default handling */
 
 	  result = htonl((int)result);

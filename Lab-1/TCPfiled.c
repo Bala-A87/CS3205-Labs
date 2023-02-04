@@ -118,22 +118,28 @@ TCPfiled(int s)
 	while(cc = read(s, buf, sizeof(buf))) {
 	  if (cc < 0)
 	    errexit("read from client: %s\n", strerror(errno));
+	  if (!strcmp(buf, "\0"))
+	  	continue;
+	
+	  printf("\n");
+
 	  for(i = 0; buf[i]; i++) {
 		if(buf[i] == ' ') {
 			spaceloc = i;
 			break;
 		}
 	  }
+	  memset(filename, 0, sizeof(filename));
 	  strncpy(filename, buf, spaceloc);
 	  bytestoread = atoi(buf+spaceloc+1);
 
 	  filedesc = open(filename, O_RDONLY);
+	  memset(result, 0, sizeof(result));
 	  if(filedesc < 0) {
 		strcpy(result, "SORRY!");
 		printf("File %s not found\n", filename);
 	  }
 	  else {
-		memset(result, 0, sizeof(result));
 	  	printf("Reading %d bytes from the end of file %s\n", bytestoread, filename);
 		cc = pread(filedesc, result, bytestoread, lseek(filedesc, -bytestoread, SEEK_END));
 		if (cc < 0)
@@ -143,7 +149,7 @@ TCPfiled(int s)
 
 	  if(write(s, result, bytestoread) < 0)
 	 	errexit("write to client: %s\n", strerror(errno));
-
+	  printf("Read: %s\n", result);
 	  memset(buf, 0, sizeof(buf));
 	}
 	return 0;

@@ -12,7 +12,7 @@ SERVS = UDPechod UDPmathd TCPfiled
 OTHER = superd TCPmtechod
 
 DEFS = 
-CFLAGS = -W -pedantic -ansi -g -lm ${DEFS} ${INCLUDE}
+CFLAGS = -W -pedantic -ansi -g ${DEFS} ${INCLUDE}
 
 HDR =
 CSRC = UDPecho.c UDPmath.c TCPfile.c
@@ -32,7 +32,7 @@ ${CLNTS}: ${CXOBJ}
 	${CC} -o $@ ${CFLAGS} $@.o ${CXOBJ}
 
 ${SERVS}: ${SXOBJ}
-	${CC} -o $@ ${CFLAGS} $@.o ${SXOBJ}
+	${CC} -o $@ ${CFLAGS} $@.o ${SXOBJ} -lm
 
 superd: ${SXOBJ} superd.o sv_funcs.o
 	${CC} -o $@ ${CFLAGS} $@.o ${SXOBJ} sv_funcs.o
