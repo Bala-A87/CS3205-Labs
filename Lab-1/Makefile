@@ -7,18 +7,18 @@
 
 INCLUDE =
 
-CLNTS = UDPecho
-SERVS = UDPechod
+CLNTS = UDPecho UDPmath
+SERVS = UDPechod UDPmathd
 OTHER = superd TCPmtechod
 
-DEFS =
-CFLAGS = -W -pedantic -ansi -g ${DEFS} ${INCLUDE}
+DEFS = 
+CFLAGS = -W -pedantic -ansi -g -lm ${DEFS} ${INCLUDE}
 
 HDR =
-CSRC = UDPecho.c
+CSRC = UDPecho.c UDPmath.c
 CXSRC = connectsock.c errexit.c
 
-SSRC = UDPechod.c
+SSRC = UDPechod.c UDPmathd.c
 SXSRC = passivesock.c sv_funcs.c
 
 CXOBJ = connectsock.o errexit.o
@@ -69,6 +69,8 @@ ${HDR} ${CSRC} ${CXSRC} ${SSRC} ${SXSRC}:
 
 UDPechod: UDPechod.o
 UDPecho: UDPecho.o
+UDPmathd: UDPmathd.o
+UDPmath: UDPmath.o
 
 FRC:
 	
