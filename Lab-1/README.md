@@ -32,5 +32,5 @@ Commands to be run in shell for client:
 
 ## Credits
 
-- Placeholder text for sample files for q3 generated using [Lorem Ipsum]("https://loremipsum.io/")
+- Placeholder text for sample files for q3 generated using [Lorem Ipsum](https://loremipsum.io/)
 - C template code used as suggested by instructor, based on Douglas Comer's [Internetworking with TCP/IP](https://books.google.co.in/books/about/Internetworking_with_TCP_IP_Principles_p.html?id=jonyuTASbWAC&source=kp_book_description&redir_esc=y)
