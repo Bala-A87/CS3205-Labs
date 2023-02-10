@@ -6,6 +6,7 @@
 3. Server - TCPfiled, Client - TCPfile
 
 ## Executing code
+
 ### Compiling
 `make <filename>`
 
@@ -24,6 +25,12 @@ Commands to be run in shell for client:
 
 `make clean` can be run after terminating client and server to clean up object files and executables.
 
-## Known limitations/bugs
+## Assumptions
 
-- Requires filename with extension for q3
+- Operands for q2 lie within 32-bit signed integer range, and operation will be one of the 4 operations mentioned in the question
+- Filename for q3 is provided with extension, and the 1 to be appended to the new filename is appended to the whole name, including exntension
+
+## Credits
+
+- Placeholder text for sample files for q3 generated using [Lorem Ipsum]("https://loremipsum.io/")
+- C template code used as suggested by instructor, based on Douglas Comer's [Internetworking with TCP/IP](https://books.google.co.in/books/about/Internetworking_with_TCP_IP_Principles_p.html?id=jonyuTASbWAC&source=kp_book_description&redir_esc=y)
