@@ -13,8 +13,6 @@
 
 #define	BUFSIZE 64
 
-#define	UNIXEPOCH	2208988800UL	/* UNIX epoch, in UCT secs	*/
-
 int	errexit(const char *format, ...);
 
 int
@@ -47,7 +45,7 @@ main(int argc, char *argv[])
 		host = argv[1];
 		break;
 	default:
-		fprintf(stderr, "usage: UDPtime [host [port]]\n");
+		fprintf(stderr, "usage: UDPecho [host [port]]\n");
 		exit(1);
 	}
 

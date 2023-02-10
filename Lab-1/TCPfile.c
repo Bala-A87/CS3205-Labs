@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
 
 void	TCPfile(const char *host, const char *service);
 int	errexit(const char *format, ...);
@@ -61,7 +62,10 @@ TCPfile(const char *host, const char *service)
 	int	inchars, i;	/* characters sent and received	*/
 	struct sockaddr_in serveraddr;
 	socklen_t len;
-	int bytestoread, space, bytestocompare;
+	int bytestoread, space, new_fd;
+	size_t bytestocompare; /* number of bytes to compare if file not found */
+	/* Received number of bytes, location of space, new file descriptor */
+	char filename[32]; /* Received file name */
 
 	s = 	connectsock(host, service, "tcp");
 	if (s < 0)
@@ -84,30 +88,36 @@ TCPfile(const char *host, const char *service)
 		buf[LINELEN] = '\0';	/* insure line null-terminated	*/
 		(void) write(s, buf, sizeof(buf));
 
-		for(i = 0; buf[i]; i++)
+		for(i = 0; buf[i]; i++) /* Find location of space to extract file name and number of bytes */
 			if(buf[i] == ' ') {
 				space = i;
 				break;
 			}
-		bytestoread = atoi(buf+space+1);
+		bytestoread = atoi(buf+space+1); /* String (converted to integer) after space = bytes to read */
+		memset(filename, 0, sizeof(filename));
+		strncpy(filename, buf, space); /* String until before space = file name */
 
 		memset(buf, 0, sizeof(buf));
 
 		/* read it back */
 
-		for (inchars = 0; inchars < bytestoread; inchars+=n ) {
+		for (inchars = 0; inchars < bytestoread; inchars+=n ) { /* Read bytestoread number of bytes */
 			n = read(s, &buf[inchars], bytestoread - inchars);
 			if (n < 0)
 				errexit("socket read failed: %s\n",
 					strerror(errno));
 		}
-		bytestocompare = 6;
-		if(strlen(buf) < 6)
+		bytestocompare = strlen(FNFSTRING);
+		if(strlen(buf) < bytestocompare)
 			bytestocompare = strlen(buf);
+		/* If file doesn't exist, result may contain a substring of FNFSTRING, so determine how many characters to compare */
 		if(!strncmp(FNFSTRING, buf, bytestocompare)) 
-			printf("Server says that the file does not exist.\n");
+			printf("Server says that the file does not exist.\n"); /* File not found, result is substring of FNFSTRING */
 		else
-			printf("%s\n", buf);
+			printf("Content read: %s\n", buf);
+		new_fd = creat(strcat(filename, "1"), 0666); /* Create filename1 with RW permissions */
+		write(new_fd, buf, strlen(buf));
+		close(new_fd);
 		memset(buf, 0, sizeof(buf));
 		printf("\n");
 	}

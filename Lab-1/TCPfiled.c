@@ -88,13 +88,13 @@ main(int argc, char *argv[])
 int
 TCPfiled(int s)
 {
-	char	buf[BUFSIZ], result[BUFSIZ];
+	char	buf[BUFSIZ], result[BUFSIZ]; /* Input buffer, output buffer */
 	int	cc;
 	struct sockaddr_in clientaddr;
 	socklen_t len;
-	char filename[32];
-	int bytestoread, spaceloc, i;
-	int filedesc;
+	char filename[32]; /* File name received */
+	int bytestoread, spaceloc, i; /* Number of bytes to read (input), location of space, iterator variable */
+	int filedesc; /* File descriptor of required file */
 
 	len = sizeof(clientaddr);
 	getpeername(s, (struct sockaddr*)&clientaddr, &len);
@@ -106,51 +106,43 @@ TCPfiled(int s)
 	
 	memset(buf, 0, sizeof(buf));
 
-	/* while (cc = read(s, buf, sizeof(buf))) {
-	  if (cc < 0)
-	    errexit("echo read: %s\n", strerror(errno));
-	  if (write(s, buf, cc) < 0)
-	    errexit("echo write: %s\n", strerror(errno));
-	  printf("Client sent: %s", buf);
-	  memset(buf, 0, sizeof(buf));
-	} */
-
 	while(cc = read(s, buf, sizeof(buf))) {
 	  if (cc < 0)
 	    errexit("read from client: %s\n", strerror(errno));
-	  if (!strcmp(buf, "\0"))
+	  if (!strcmp(buf, "\0")) /* Sometimes, phantom (null character) reads occur, which is handled here by ignoring them */
 	  	continue;
 	
 	  printf("\n");
 
-	  for(i = 0; buf[i]; i++) {
+	  for(i = 0; buf[i]; i++) { /* Find location of space to extract file name and number of bytes */
 		if(buf[i] == ' ') {
 			spaceloc = i;
 			break;
 		}
 	  }
 	  memset(filename, 0, sizeof(filename));
-	  strncpy(filename, buf, spaceloc);
-	  bytestoread = atoi(buf+spaceloc+1);
+	  strncpy(filename, buf, spaceloc);  /* String before space = file name */
+	  bytestoread = atoi(buf+spaceloc+1); /* String after space (converted to int) = bytes to read */
 
-	  filedesc = open(filename, O_RDONLY);
 	  memset(result, 0, sizeof(result));
-	  if(filedesc < 0) {
-		strcpy(result, "SORRY!");
+	  filedesc = open(filename, O_RDONLY);
+	  if(filedesc < 0) { /* File not found */
+		strcpy(result, "SORRY!"); /* Special result string */
 		printf("File %s not found\n", filename);
 	  }
 	  else {
 	  	printf("Reading %d bytes from the end of file %s\n", bytestoread, filename);
-		cc = pread(filedesc, result, bytestoread, lseek(filedesc, -bytestoread, SEEK_END));
+		/* Position file pointer to required position from end of file, then read */
+		cc = pread(filedesc, result, bytestoread, lseek(filedesc, -bytestoread, SEEK_END)); 
 		if (cc < 0)
 	    	errexit("read from file: %s\n", strerror(errno));
 		close(filedesc);
 	  }
 
+	  memset(buf, 0, sizeof(buf));
 	  if(write(s, result, bytestoread) < 0)
 	 	errexit("write to client: %s\n", strerror(errno));
 	  printf("Read: %s\n", result);
-	  memset(buf, 0, sizeof(buf));
 	}
 	return 0;
 }

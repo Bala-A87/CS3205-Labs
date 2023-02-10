@@ -13,8 +13,6 @@
 
 #define	BUFSIZE 64
 
-#define	UNIXEPOCH	2208988800UL	/* UNIX epoch, in UCT secs	*/
-
 int	errexit(const char *format, ...);
 
 int
@@ -48,7 +46,7 @@ main(int argc, char *argv[])
 		host = argv[1];
 		break;
 	default:
-		fprintf(stderr, "usage: UDPtime [host [port]]\n");
+		fprintf(stderr, "usage: UDPmath [host [port]]\n");
 		exit(1);
 	}
 
@@ -73,7 +71,7 @@ main(int argc, char *argv[])
 	if (n < 0)
 		errexit("read failed: %s\n", strerror(errno));
 	result = ntohl((int)result);	
-	printf("%d\n", result);
+	printf("Answer from server: %d\n", result);
 
 	exit(0);
 }

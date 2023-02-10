@@ -25,17 +25,16 @@ int
 main(int argc, char *argv[])
 {
 	struct sockaddr_in fsin;	/* the from address of a client	*/
-	char	*service = "time";	/* service name or port number	*/
+	char	*service = "math";	/* service name or port number	*/
 	char	buf[32];			/* "input" buffer; any size > 0	*/
 	int	sock;			/* server socket		*/
 	int	result;			/* current time			*/
 	unsigned int	alen;		/* from-address length		*/
-	char op[4];
-	int op1, op2;
-	char temp[32];
-	int space1 = -1, space2 = -1;
-	int i;
-	char unknown_op_error[64];
+	char op[4];	/* operation to perform */
+	int op1, op2; /* operands for the operation */
+	char temp[32]; /* temporary buffer for string to integer conversion */
+	int space1 = -1, space2 = -1; /* locations of white spaces in the input */
+	int i; /* iterator variable */
 
 
 	switch (argc) {
@@ -45,7 +44,7 @@ main(int argc, char *argv[])
 		service = argv[1];
 		break;
 	default:
-		errexit("usage: UDPtimed [port]\n");
+		errexit("usage: UDPmathd [port]\n");
 	}
 
 	sock = passivesock(service, "udp", 0);
@@ -66,7 +65,7 @@ main(int argc, char *argv[])
 	  if (count < 0)
 	    errexit("recvfrom: %s\n", strerror(errno));
 
-	  for(i = 0; buf[i]; i++)
+	  for(i = 0; buf[i]; i++) /* Determine indices of spaces to extract operation and operands */
 		if(buf[i] == ' ') {
 			if(space1 == -1)
 				space1 = i;
@@ -77,16 +76,16 @@ main(int argc, char *argv[])
 	  printf("Command received: %s\n", buf);
 	
 	  memset(op, 0, sizeof(op));
-	  strncpy(op, buf, space1);
+	  strncpy(op, buf, space1); /* String from beginning to before first space = operation */
 	  printf("Operation: %s\n", op);
 
 	  memset(temp, 0, sizeof(temp));
-	  strncpy(temp, buf+space1+1, space2-space1-1);
-	  op1 = atoi(temp);
+	  strncpy(temp, buf+space1+1, space2-space1-1); /* String from after first space to before second space = operand 1 */
+	  op1 = atoi(temp); /* Convert string to integer */
 	  printf("Operand 1: %d\n", op1);
 
 	  memset(temp, 0, sizeof(temp));
-	  strncpy(temp, buf+space2+1, i-space2-1);
+	  strncpy(temp, buf+space2+1, i-space2-1); /* String from after second space until end = operand 2 */
 	  op2 = atoi(temp);
 	  printf("Operand 2: %d\n", op2);
 
@@ -98,7 +97,6 @@ main(int argc, char *argv[])
 	    result = op1 % op2;
 	  else if(!strcmp(op, "hyp"))
 		result = (int) sqrt(op1*op1 + op2*op2);
-		/* Try default handling */
 
 	  result = htonl((int)result);
 		

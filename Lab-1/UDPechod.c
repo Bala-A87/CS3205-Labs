@@ -12,8 +12,6 @@
 int	passiveUDP(const char *service);
 int	errexit(const char *format, ...);
 
-#define	UNIXEPOCH	2208988800UL	/* UNIX epoch, in UCT secs	*/
-
 int
 passivesock(const char *service, const char *transport, int qlen);
 
@@ -25,7 +23,7 @@ int
 main(int argc, char *argv[])
 {
 	struct sockaddr_in fsin;	/* the from address of a client	*/
-	char	*service = "time";	/* service name or port number	*/
+	char	*service = "echo";	/* service name or port number	*/
 	char	buf[1024];			/* "input" buffer; any size > 0	*/
 	int	sock;			/* server socket		*/
 	unsigned int	alen;		/* from-address length		*/
@@ -37,7 +35,7 @@ main(int argc, char *argv[])
 		service = argv[1];
 		break;
 	default:
-		errexit("usage: UDPtimed [port]\n");
+		errexit("usage: UDPechod [port]\n");
 	}
 
 	sock = passivesock(service, "udp", 0);
