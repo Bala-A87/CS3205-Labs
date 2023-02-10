@@ -30,6 +30,9 @@ Commands to be run in shell for client:
 - Operands for q2 lie within 32-bit signed integer range, and operation will be one of the 4 operations mentioned in the question
 - Filename for q3 is provided with extension, and the 1 to be appended to the new filename is appended to the whole name, including exntension
 
+## Known bugs
+None - programs work correctly to the best of my knowledge.
+
 ## Credits
 
 - Placeholder text for sample files for q3 generated using [Lorem Ipsum](https://loremipsum.io/)
