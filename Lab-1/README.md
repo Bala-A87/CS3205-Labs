@@ -28,7 +28,8 @@ Commands to be run in shell for client:
 ## Assumptions
 
 - Operands for q2 lie within 32-bit signed integer range, and operation will be one of the 4 operations mentioned in the question
-- Filename for q3 is provided with extension, and the 1 to be appended to the new filename is appended to the whole name, including exntension
+- Filename for q3 is provided with extension, and the 1 to be appended to the new filename is appended to the whole name, including extension
+- Content read from file in q3 is not a prefix of SORRY! and SORRY! is not a prefix of the content read
 
 ## Known bugs
 None - programs work correctly to the best of my knowledge.
