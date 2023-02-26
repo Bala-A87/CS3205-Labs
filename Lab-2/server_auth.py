@@ -1,17 +1,24 @@
-#https://pythontic.com/modules/socket/udp-client-server-example
+# NAME: Balakrishnan A
+# Roll Number: CS20B012
+# Course: CS3205 Jan. 2023 semester
+# Lab number: 2
+# Date of submission: TODO
+# I confirm that the source file is entirely written by me without resorting to any dishonest means.
+# Website that I used for basic socket programming code is:
+# URL: https://pythontic.com/modules/socket/udp-client-server-example
+
 import socket
 import sys
+from pathlib import Path 
 
-# localIP     = "127.0.0.1"
-# localPort   = 20001
 runningIP = sys.argv[1]
-startPort = int(sys.argv[2])
-serverNo = int(sys.argv[3])
-runningPort = startPort + 56 + serverNo
+runningPort = int(sys.argv[2])
+addressMapping = eval(sys.argv[3])
 bufferSize  = 1024
+logFilePath = Path('logs/ADS.output')
 
-msgFromServer       = "Hello UDP Client"
-bytesToSend         = str.encode(msgFromServer)
+# msgFromServer       = addressMapping['www.google.com']
+# bytesToSend         = str.encode(msgFromServer)
 
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -26,11 +33,25 @@ while (True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
     message = bytesAddressPair[0].decode()
     address = bytesAddressPair[1]
-    clientMsg = "Message from Client: {}".format(message)
-    clientIP  = "Client IP Address: {}".format(address)
+
+    if message == 'bye':
+        break
+
+    clientMsg = "Query from Client: {}\n".format(message)
+    clientIP  = "Client IP Address: {}\n".format(address)
     
-    print(clientMsg)
-    print(clientIP)
+    with open(logFilePath, 'a') as f:
+        f.write(clientMsg)
+        f.write(clientIP)
+
+    msgFromServer = addressMapping[message]
+
+    with open(logFilePath, 'a') as f:
+        f.write(f'Response sent: {msgFromServer}\n')
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgFromServer.encode(), address)
+
+    # break # deal later
+
+UDPServerSocket.close()

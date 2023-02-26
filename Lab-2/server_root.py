@@ -1,23 +1,27 @@
-#https://pythontic.com/modules/socket/udp-client-server-example
+# NAME: Balakrishnan A
+# Roll Number: CS20B012
+# Course: CS3205 Jan. 2023 semester
+# Lab number: 2
+# Date of submission: TODO
+# I confirm that the source file is entirely written by me without resorting to any dishonest means.
+# Website that I used for basic socket programming code is:
+# URL: https://pythontic.com/modules/socket/udp-client-server-example
+
 import socket
 import sys
+from pathlib import Path
 
-def find_tld(server_name : str) -> int:
-    tld_id = server_name.split('.')[-1]
-    if tld_id == 'com':
-        return 1 # maybe modify to match the port no - start port no
-    else:
-        return 2
+def find_tld(server_name: str) -> str:
+    return server_name.split('.')[-1]
 
-# localIP     = "127.0.0.1"
-# localPort   = 20001
 runningIP = sys.argv[1]
-startPort = int(sys.argv[2])
-runningPort = startPort + 54
+runningPort = int(sys.argv[2])
+TLDServerDict = eval(sys.argv[3])
 bufferSize  = 1024
+logFilePath = Path('logs/RDS.output')
 
-msgFromServer       = "Hello UDP Client"
-bytesToSend         = str.encode(msgFromServer)
+# msgFromServer       = str(TLDServerDict['com'])
+# bytesToSend         = str.encode(msgFromServer)
 
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -32,11 +36,32 @@ while (True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
     message = bytesAddressPair[0].decode()
     address = bytesAddressPair[1]
-    clientMsg = "Message from Client: {}".format(message)
-    clientIP  = "Client IP Address: {}".format(address)
+
+    if message == 'bye':
+        UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        for tld in TLDServerDict:
+            TLDServerAddressPort = (TLDServerDict[tld]['address'], TLDServerDict[tld]['port'])
+            UDPClientSocket.sendto(str.encode(message), TLDServerAddressPort)
+        UDPClientSocket.close()
+        break
+
+    clientMsg = "Query from Client: {}\n".format(message)
+    clientIP  = "Client IP Address: {}\n".format(address)
     
-    print(clientMsg)
-    print(clientIP)
+    with open(logFilePath, 'a') as f:
+        f.write(clientMsg)
+        f.write(clientIP)
+    # print(clientMsg)
+    # print(clientIP)
+
+    tld = find_tld(message)
+    msgFromServer = str(TLDServerDict[tld])
+
+    with open(logFilePath, 'a') as f:
+        f.write(f'Reponse sent: {msgFromServer}\n')
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgFromServer.encode(), address)
+    # break # deal later
+
+UDPServerSocket.close()

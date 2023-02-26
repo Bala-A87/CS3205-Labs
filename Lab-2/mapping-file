@@ -1,0 +1,48 @@
+BEGIN_DATA
+NR 127.0.0.1
+RDS 127.0.0.1
+TDS_com 127.0.0.1
+TDS_edu 127.0.0.1
+ADS1 127.0.0.1
+ADS2 127.0.0.1
+ADS3 127.0.0.1
+ADS4 127.0.0.1
+ADS5 127.0.0.1
+ADS6 127.0.0.1
+List_of_ADS1
+www.abank.com 202.15.5.1
+smtp.abank.com 202.15.5.2
+ftp.abank.com 202.15.5.3
+sshd1.abank.com 202.15.5.4
+vpn.abank.com 202.15.5.5
+List_of_ADS2
+www.boodle.com 62.4.12.1
+smtp.boodle.com 62.4.12.2
+ftp.boodle.com 62.4.12.3
+sshd1.boodle.com 62.4.12.4
+vpn.boodle.com 62.4.12.5
+List_of_ADS3
+www.raven.com 109.21.32.1
+smtp.raven.com 109.21.32.2
+ftp.raven.com 109.21.32.3
+sshd1.raven.com 109.21.32.4
+vpn.raven.com 109.21.32.5
+List_of_ADS4
+www.iitus.edu 72.111.8.1
+smtp.iitus.edu 72.111.8.2
+ftp.iitus.edu 72.111.8.3
+sshd1.iitus.edu 72.111.8.4
+vpn.iitus.edu 72.111.8.5
+List_of_ADS5
+www.green.edu 192.13.5.1
+smtp.green.edu 192.13.5.2
+ftp.green.edu 192.13.5.3
+sshd1.green.edu 192.13.5.4
+vpn.green.edu 192.13.5.5
+List_of_ADS6
+www.caluni.edu 91.142.200.1
+smtp.caluni.edu 91.142.200.2
+ftp.caluni.edu 91.142.200.3
+sshd1.caluni.edu 91.142.200.4
+vpn.caluni.edu 91.142.200.5
+END_DATA

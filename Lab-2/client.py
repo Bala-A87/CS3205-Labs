@@ -1,29 +1,47 @@
-#https://pythontic.com/modules/socket/udp-client-server-example
+# NAME: Balakrishnan A
+# Roll Number: CS20B012
+# Course: CS3205 Jan. 2023 semester
+# Lab number: 2
+# Date of submission: TODO
+# I confirm that the source file is entirely written by me without resorting to any dishonest means.
+# Website that I used for basic socket programming code is:
+# URL: https://pythontic.com/modules/socket/udp-client-server-example
+
 import socket
 import sys
 
 addressNR = sys.argv[1]
-startPort = int(sys.argv[2])
-portNR = startPort + 53
+portNR = int(sys.argv[2])
 
-# msgFromClient       = "Hello UDP Server"
-msgFromClient       = input('Enter message to send: ')
-bytesToSend         = str.encode(msgFromClient)
 serverAddressPort   = (addressNR, portNR)
 bufferSize          = 1024
 
 # Create a UDP socket at client side
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-# Send to server using created UDP socket
-UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+while True:
+    msgFromClient       = input('Enter Server Name: ')
+    bytesToSend         = str.encode(msgFromClient)
 
-#Wait on recvfrom()
-msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+    # Send to server using created UDP socket
+    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 
-#Wait completed
-msg = "Message from Server: {}".format(msgFromServer[0].decode())
+    if msgFromClient == 'bye':
+        print('All Server Processes are killed. Exiting.')
+        break
 
-print(msg)
+    #Wait on recvfrom()
+    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+
+    #Wait completed
+    msg = msgFromServer[0].decode()
+
+    # if msg == 'bye':
+    #     print('All Server Processes are killed. Exiting.')
+    #     break
+
+    print('DNS Mapping:', msg)
+
+    # break # deal later
 
 UDPClientSocket.close()
