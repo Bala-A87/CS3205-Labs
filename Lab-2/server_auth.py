@@ -17,16 +17,11 @@ addressMapping = eval(sys.argv[3])
 bufferSize  = 1024
 logFilePath = Path('logs/ADS.output')
 
-# msgFromServer       = addressMapping['www.google.com']
-# bytesToSend         = str.encode(msgFromServer)
-
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Bind to address and ip
 UDPServerSocket.bind((runningIP, runningPort))
-
-print("UDP server up and listening")
 
 # Listen for incoming datagrams
 while (True):
@@ -47,11 +42,9 @@ while (True):
     msgFromServer = addressMapping[message]
 
     with open(logFilePath, 'a') as f:
-        f.write(f'Response sent: {msgFromServer}\n')
+        f.write(f'Response sent: {msgFromServer}\n\n')
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgFromServer.encode(), address)
-
-    # break # deal later
 
 UDPServerSocket.close()

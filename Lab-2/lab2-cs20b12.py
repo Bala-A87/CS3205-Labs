@@ -79,9 +79,6 @@ params = [
 
 client_params = ['client.py', str(DNSMapping['NR']), str(startPort+53)]
 
-# use these params to execlp
-# os.execlp('python3', 'python3', *params[0]) for example
-
 for count in range(10):
     pid = os.fork()
     if pid == 0:

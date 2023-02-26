@@ -30,18 +30,12 @@ while True:
         print('All Server Processes are killed. Exiting.')
         break
 
-    #Wait on recvfrom()
+    # Wait on recvfrom()
     msgFromServer = UDPClientSocket.recvfrom(bufferSize)
 
-    #Wait completed
+    # Wait completed
     msg = msgFromServer[0].decode()
 
-    # if msg == 'bye':
-    #     print('All Server Processes are killed. Exiting.')
-    #     break
-
     print('DNS Mapping:', msg)
-
-    # break # deal later
 
 UDPClientSocket.close()

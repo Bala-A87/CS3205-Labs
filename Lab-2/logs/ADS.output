@@ -1,3 +1,8 @@
 Query from Client: smtp.raven.com
-Client IP Address: ('127.0.0.1', 51772)
+Client IP Address: ('127.0.0.1', 48273)
 Response sent: 109.21.32.2
+
+Query from Client: vpn.iitus.edu
+Client IP Address: ('127.0.0.1', 39841)
+Response sent: 72.111.8.5
+
