@@ -52,14 +52,14 @@ for line in mappingFileLines:
 ADSMapping_com = {}
 ADSMapping_edu = {}
 
-for mappings in [ADS1Mapping, ADS2Mapping, ADS3Mapping, ADS4Mapping, ADS5Mapping, ADS6Mapping]:
+for ADS_no, mappings in enumerate([ADS1Mapping, ADS2Mapping, ADS3Mapping, ADS4Mapping, ADS5Mapping, ADS6Mapping]):
     ex_dom = list(mappings.keys())[0].split('.')
     tld = ex_dom[-1]
     auth_dom = ex_dom[-2] + '.' + ex_dom[-1]
     if tld == 'com':
-        ADSMapping_com[auth_dom] = mappings
+        ADSMapping_com[auth_dom] = {'address': DNSMapping['ADS'+str(ADS_no+1)], 'port': startPort+57+ADS_no}
     else:
-        ADSMapping_edu[auth_dom] = mappings
+        ADSMapping_edu[auth_dom] = {'address': DNSMapping['ADS'+str(ADS_no+1)], 'port': startPort+57+ADS_no}
 
 params = [
     ['server_nr.py', str(DNSMapping['NR']), str(startPort+53), str({'address': DNSMapping['RDS'], 'port': startPort+54})],
