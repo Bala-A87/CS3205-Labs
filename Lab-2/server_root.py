@@ -10,6 +10,7 @@
 import socket
 import sys
 from pathlib import Path
+import datetime as dt
 
 def find_tld(server_name: str) -> str:
     return server_name.split('.')[-1]
@@ -19,6 +20,7 @@ runningPort = int(sys.argv[2])
 TLDServerDict = eval(sys.argv[3])
 bufferSize  = 1024
 logFilePath = Path('logs/RDS.output')
+ERROR_MSG = 'ERROR'
 
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -40,18 +42,21 @@ while (True):
         UDPClientSocket.close()
         break
 
-    clientMsg = "Query from Client: {}\n".format(message)
-    clientIP  = "Client IP Address: {}\n".format(address)
+    clientMsg = "[{}]\tQuery from Client: {}\n".format(dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+    clientIP  = "[{}]\tClient IP Address: {}\n".format(dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), address)
     
     with open(logFilePath, 'a') as f:
         f.write(clientMsg)
         f.write(clientIP)
 
     tld = find_tld(message)
-    msgFromServer = str(TLDServerDict[tld])
+    if tld in TLDServerDict.keys():
+        msgFromServer = str(TLDServerDict[tld])
+    else:
+        msgFromServer = str({'address': ERROR_MSG, 'port': ERROR_MSG})
 
     with open(logFilePath, 'a') as f:
-        f.write(f'Reponse sent: {msgFromServer}\n\n')
+        f.write(f'[{dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]\tReponse sent: {msgFromServer}\n\n')
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgFromServer.encode(), address)

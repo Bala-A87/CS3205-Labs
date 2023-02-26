@@ -15,6 +15,7 @@ portNR = int(sys.argv[2])
 
 serverAddressPort   = (addressNR, portNR)
 bufferSize          = 1024
+ERROR_MSG = 'ERROR'
 
 # Create a UDP socket at client side
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -36,6 +37,9 @@ while True:
     # Wait completed
     msg = msgFromServer[0].decode()
 
-    print('DNS Mapping:', msg)
+    if msg == ERROR_MSG:
+        print('No DNS Record Found')
+    else:
+        print('DNS Mapping:', msg)
 
 UDPClientSocket.close()

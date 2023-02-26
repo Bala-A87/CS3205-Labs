@@ -1,8 +1,36 @@
-Query from Client: smtp.raven.com
-Client IP Address: ('127.0.0.1', 48273)
-Response sent: 109.21.32.2
+[2023-02-26 21:38:08]	Query from Client: ftp.abank.com
+[2023-02-26 21:38:08]	Client IP Address: ('127.0.0.1', 35935)
+[2023-02-26 21:38:08]	Response sent: 202.15.5.3
 
-Query from Client: vpn.iitus.edu
-Client IP Address: ('127.0.0.1', 39841)
-Response sent: 72.111.8.5
+[2023-02-26 21:38:15]	Query from Client: www.boodle.com
+[2023-02-26 21:38:15]	Client IP Address: ('127.0.0.1', 38271)
+[2023-02-26 21:38:15]	Response sent: 62.4.12.1
+
+[2023-02-26 21:38:24]	Query from Client: sshd1.green.edu
+[2023-02-26 21:38:24]	Client IP Address: ('127.0.0.1', 56328)
+[2023-02-26 21:38:24]	Response sent: 192.13.5.4
+
+[2023-02-26 21:38:49]	Query from Client: vpn.iitus.edu
+[2023-02-26 21:38:49]	Client IP Address: ('127.0.0.1', 45882)
+[2023-02-26 21:38:49]	Response sent: 72.111.8.5
+
+[2023-02-26 21:39:00]	Query from Client: www.caluni.edu
+[2023-02-26 21:39:00]	Client IP Address: ('127.0.0.1', 36835)
+[2023-02-26 21:39:00]	Response sent: 91.142.200.1
+
+[2023-02-26 21:39:15]	Query from Client: smtp.raven.com
+[2023-02-26 21:39:15]	Client IP Address: ('127.0.0.1', 35611)
+[2023-02-26 21:39:15]	Response sent: 109.21.32.2
+
+[2023-02-26 21:39:23]	Query from Client: smpt.raven.com
+[2023-02-26 21:39:23]	Client IP Address: ('127.0.0.1', 32804)
+[2023-02-26 21:39:23]	Response sent: ERROR
+
+[2023-02-26 21:39:44]	Query from Client: smtp1.raven.com
+[2023-02-26 21:39:44]	Client IP Address: ('127.0.0.1', 60274)
+[2023-02-26 21:39:44]	Response sent: ERROR
+
+[2023-02-26 21:39:56]	Query from Client: a.smtp.raven.com
+[2023-02-26 21:39:56]	Client IP Address: ('127.0.0.1', 44401)
+[2023-02-26 21:39:56]	Response sent: ERROR
 

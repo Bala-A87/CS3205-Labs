@@ -1,3 +1,12 @@
+# NAME: Balakrishnan A
+# Roll Number: CS20B012
+# Course: CS3205 Jan. 2023 semester
+# Lab number: 2
+# Date of submission: TODO
+# I confirm that the source file is entirely written by me without resorting to any dishonest means.
+# Website that I used for basic socket programming code is:
+# URL: https://pythontic.com/modules/socket/udp-client-server-example
+
 import os
 import sys
 from pathlib import Path

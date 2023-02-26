@@ -10,12 +10,14 @@
 import socket
 import sys
 from pathlib import Path 
+import datetime as dt
 
 runningIP = sys.argv[1]
 runningPort = int(sys.argv[2])
 addressMapping = eval(sys.argv[3])
 bufferSize  = 1024
 logFilePath = Path('logs/ADS.output')
+ERROR_MSG = 'ERROR'
 
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -32,17 +34,20 @@ while (True):
     if message == 'bye':
         break
 
-    clientMsg = "Query from Client: {}\n".format(message)
-    clientIP  = "Client IP Address: {}\n".format(address)
+    clientMsg = "[{}]\tQuery from Client: {}\n".format(dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+    clientIP  = "[{}]\tClient IP Address: {}\n".format(dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), address)
     
     with open(logFilePath, 'a') as f:
         f.write(clientMsg)
         f.write(clientIP)
 
-    msgFromServer = addressMapping[message]
+    if message in addressMapping.keys():
+        msgFromServer = addressMapping[message]
+    else:
+        msgFromServer = ERROR_MSG
 
     with open(logFilePath, 'a') as f:
-        f.write(f'Response sent: {msgFromServer}\n\n')
+        f.write(f'[{dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]\tResponse sent: {msgFromServer}\n\n')
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgFromServer.encode(), address)
