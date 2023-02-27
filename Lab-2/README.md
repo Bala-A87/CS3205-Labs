@@ -15,7 +15,7 @@ Python
 ## Executing code
 
 `python3 lab2-cs20b012.py <startportnum> <inputfile>` <br>
-where \<startportnum\> is the number K (>1024) to use to assign port numbers to the respective servers, and \<inputfile\> is the file containing the name-address mapping as specified in the problem statement.
+where \<startportnum\> is the number K (>1024) to use to assign port numbers to the respective servers, and \<inputfile\> is the file containing the name-address mapping as specified in the problem statement. Makefile is not required as no compilation is needed.
 
 Running the above will create processes for all the (10) servers, and will proceed to run the client, allowing the user to provide server names and receive the corresponding IP addresses (if valid mappings are present in \<inputfile\>) or a message notifying the user that no corresponding DNS record exists and could not be resolved to an IP address.
 

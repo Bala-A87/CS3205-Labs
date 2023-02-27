@@ -11,6 +11,11 @@ import os
 import sys
 from pathlib import Path
 
+if len(sys.argv) < 3:
+    print('[ERROR] Missing start port number or input file.')
+    print('[INFO] Usage: python3 lab2-cs20b012.py <startportnum> <inputfile>')
+    exit(1)
+
 startPort = int(sys.argv[1])
 mappingFileName = sys.argv[2]
 logDirPath = Path('logs/')
@@ -87,6 +92,8 @@ params = [
 ]
 
 client_params = ['client.py', str(DNSMapping['NR']), str(startPort+53)]
+
+print('[INFO] Generating session...')
 
 for count in range(10):
     pid = os.fork()

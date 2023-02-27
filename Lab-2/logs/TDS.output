@@ -1,44 +1,32 @@
-[2023-02-26 21:38:08]	Query from Client: ftp.abank.com
-[2023-02-26 21:38:08]	Client IP Address: ('127.0.0.1', 35935)
-[('2023-02-26 21:38:08',)]	Response sent: {'address': '127.0.0.1', 'port': 9140}
+[2023-02-27 10:20:33]	Query from Client: www.raven.com
+[2023-02-27 10:20:33]	Client IP Address: ('127.0.0.1', 42647)
+[2023-02-27 10:20:33]	Response sent: {'address': '127.0.0.1', 'port': 10058}
 
-[2023-02-26 21:38:15]	Query from Client: www.boodle.com
-[2023-02-26 21:38:15]	Client IP Address: ('127.0.0.1', 38271)
-[('2023-02-26 21:38:15',)]	Response sent: {'address': '127.0.0.1', 'port': 9141}
+[2023-02-27 10:20:43]	Query from Client: vpn.grren.edu
+[2023-02-27 10:20:43]	Client IP Address: ('127.0.0.1', 43295)
+[2023-02-27 10:20:43]	Response sent: {'address': 'ERROR', 'port': 'ERROR'}
 
-[2023-02-26 21:38:24]	Query from Client: sshd1.green.edu
-[2023-02-26 21:38:24]	Client IP Address: ('127.0.0.1', 56328)
-[('2023-02-26 21:38:24',)]	Response sent: {'address': '127.0.0.1', 'port': 9144}
+[2023-02-27 10:20:46]	Query from Client: vpn.green.edu
+[2023-02-27 10:20:46]	Client IP Address: ('127.0.0.1', 49883)
+[2023-02-27 10:20:46]	Response sent: {'address': '127.0.0.1', 'port': 10060}
 
-[2023-02-26 21:38:37]	Query from Client: www.colini.com
-[2023-02-26 21:38:37]	Client IP Address: ('127.0.0.1', 44364)
-[('2023-02-26 21:38:37',)]	Response sent: {'address': 'ERROR', 'port': 'ERROR'}
+[2023-02-27 10:20:52]	Query from Client: sshd1.caluni.edu
+[2023-02-27 10:20:52]	Client IP Address: ('127.0.0.1', 59077)
+[2023-02-27 10:20:52]	Response sent: {'address': '127.0.0.1', 'port': 10061}
 
-[2023-02-26 21:38:49]	Query from Client: vpn.iitus.edu
-[2023-02-26 21:38:49]	Client IP Address: ('127.0.0.1', 45882)
-[('2023-02-26 21:38:49',)]	Response sent: {'address': '127.0.0.1', 'port': 9143}
+[2023-02-27 10:20:57]	Query from Client: fpt.boodle.com
+[2023-02-27 10:20:57]	Client IP Address: ('127.0.0.1', 36866)
+[2023-02-27 10:20:57]	Response sent: {'address': '127.0.0.1', 'port': 10057}
 
-[2023-02-26 21:39:00]	Query from Client: www.caluni.edu
-[2023-02-26 21:39:00]	Client IP Address: ('127.0.0.1', 36835)
-[('2023-02-26 21:39:00',)]	Response sent: {'address': '127.0.0.1', 'port': 9145}
+[2023-02-27 10:21:02]	Query from Client: ftp.boodle.com
+[2023-02-27 10:21:02]	Client IP Address: ('127.0.0.1', 35157)
+[2023-02-27 10:21:02]	Response sent: {'address': '127.0.0.1', 'port': 10057}
 
-[2023-02-26 21:39:15]	Query from Client: smtp.raven.com
-[2023-02-26 21:39:15]	Client IP Address: ('127.0.0.1', 35611)
-[('2023-02-26 21:39:15',)]	Response sent: {'address': '127.0.0.1', 'port': 9142}
+[2023-02-27 10:21:10]	Query from Client: smtp.abank.com
+[2023-02-27 10:21:10]	Client IP Address: ('127.0.0.1', 55026)
+[2023-02-27 10:21:10]	Response sent: {'address': '127.0.0.1', 'port': 10056}
 
-[2023-02-26 21:39:23]	Query from Client: smpt.raven.com
-[2023-02-26 21:39:23]	Client IP Address: ('127.0.0.1', 32804)
-[('2023-02-26 21:39:23',)]	Response sent: {'address': '127.0.0.1', 'port': 9142}
-
-[2023-02-26 21:39:30]	Query from Client: smtp.ravin.com
-[2023-02-26 21:39:30]	Client IP Address: ('127.0.0.1', 41361)
-[('2023-02-26 21:39:30',)]	Response sent: {'address': 'ERROR', 'port': 'ERROR'}
-
-[2023-02-26 21:39:44]	Query from Client: smtp1.raven.com
-[2023-02-26 21:39:44]	Client IP Address: ('127.0.0.1', 60274)
-[('2023-02-26 21:39:44',)]	Response sent: {'address': '127.0.0.1', 'port': 9142}
-
-[2023-02-26 21:39:56]	Query from Client: a.smtp.raven.com
-[2023-02-26 21:39:56]	Client IP Address: ('127.0.0.1', 44401)
-[('2023-02-26 21:39:56',)]	Response sent: {'address': '127.0.0.1', 'port': 9142}
+[2023-02-27 10:21:18]	Query from Client: www.iitus.edu
+[2023-02-27 10:21:18]	Client IP Address: ('127.0.0.1', 42622)
+[2023-02-27 10:21:18]	Response sent: {'address': '127.0.0.1', 'port': 10059}
 

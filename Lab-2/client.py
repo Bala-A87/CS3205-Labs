@@ -28,7 +28,7 @@ while True:
     UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 
     if msgFromClient == 'bye':
-        print('All Server Processes are killed. Exiting.')
+        print('[INFO] All Server Processes are killed. Exiting.')
         break
 
     # Wait on recvfrom()

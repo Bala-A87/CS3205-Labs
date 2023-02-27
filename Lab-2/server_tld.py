@@ -57,7 +57,7 @@ while (True):
         msgFromServer = str({'address': ERROR_MSG, 'port': ERROR_MSG})
 
     with open(logFilePath, 'a') as f:
-        f.write(f'[{dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), }]\tResponse sent: {msgFromServer}\n\n')
+        f.write(f'[{dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]\tResponse sent: {msgFromServer}\n\n')
 
     # Sending a reply to client
     UDPServerSocket.sendto(msgFromServer.encode(), address)
