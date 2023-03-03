@@ -2,7 +2,7 @@
 # Roll Number: CS20B012
 # Course: CS3205 Jan. 2023 semester
 # Lab number: 2
-# Date of submission: TODO
+# Date of submission: 3rd March 2023
 # I confirm that the source file is entirely written by me without resorting to any dishonest means.
 # Website that I used for basic socket programming code is:
 # URL: https://pythontic.com/modules/socket/udp-client-server-example
@@ -97,4 +97,3 @@ for count in range(10):
         os.execlp('python3', 'python3', *params[count])
     elif count == 9:
         os.execlp('python3', 'python3', *client_params)
-        
