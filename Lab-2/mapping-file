@@ -3,12 +3,12 @@ NR 127.0.0.1
 RDS 127.0.0.1
 TDS_com 127.0.0.1
 TDS_edu 127.0.0.1
-ADS1 127.0.0.1
-ADS2 127.0.0.1
-ADS3 127.0.0.1
-ADS4 127.0.0.1
-ADS5 127.0.0.1
-ADS6 127.0.0.1
+abank.com 127.0.0.1
+boodle.com 127.0.0.1
+raven.com 127.0.0.1
+iitus.edu 127.0.0.1
+green.edu 127.0.0.1
+caluni.edu 127.0.0.1
 List_of_ADS1
 www.abank.com 202.15.5.1
 smtp.abank.com 202.15.5.2
