@@ -1,36 +1,108 @@
-[2023-02-27 10:20:33]	Query from Client: www.raven.com
-[2023-02-27 10:20:33]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:20:33]	Response sent: 109.21.32.1
+[2023-03-03 13:57:07]	Query from Client: www.abank.com
+[2023-03-03 13:57:07]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:07]	Response sent: 202.15.5.1
 
-[2023-02-27 10:20:38]	Query from Client: vpn.green.edi
-[2023-02-27 10:20:38]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:20:38]	Response sent: ERROR
+[2023-03-03 13:57:13]	Query from Client: smtp.boode.com
+[2023-03-03 13:57:13]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:13]	Response sent: ERROR
 
-[2023-02-27 10:20:43]	Query from Client: vpn.grren.edu
-[2023-02-27 10:20:43]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:20:43]	Response sent: ERROR
+[2023-03-03 13:57:19]	Query from Client: smtp.boodle.com
+[2023-03-03 13:57:19]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:19]	Response sent: 62.4.12.2
 
-[2023-02-27 10:20:46]	Query from Client: vpn.green.edu
-[2023-02-27 10:20:46]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:20:46]	Response sent: 192.13.5.5
+[2023-03-03 13:57:25]	Query from Client: ftp.raven.com
+[2023-03-03 13:57:25]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:25]	Response sent: 109.21.32.3
 
-[2023-02-27 10:20:52]	Query from Client: sshd1.caluni.edu
-[2023-02-27 10:20:52]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:20:52]	Response sent: 91.142.200.4
+[2023-03-03 13:57:35]	Query from Client: sshdq.iitus.edu
+[2023-03-03 13:57:35]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:35]	Response sent: ERROR
 
-[2023-02-27 10:20:57]	Query from Client: fpt.boodle.com
-[2023-02-27 10:20:57]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:20:57]	Response sent: ERROR
+[2023-03-03 13:57:38]	Query from Client: sshd1.iitus.edu
+[2023-03-03 13:57:38]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:38]	Response sent: 72.111.8.4
 
-[2023-02-27 10:21:02]	Query from Client: ftp.boodle.com
-[2023-02-27 10:21:02]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:21:02]	Response sent: 62.4.12.3
+[2023-03-03 13:57:44]	Query from Client: vpn.green.edu
+[2023-03-03 13:57:44]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:44]	Response sent: 192.13.5.5
 
-[2023-02-27 10:21:10]	Query from Client: smtp.abank.com
-[2023-02-27 10:21:10]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:21:10]	Response sent: 202.15.5.2
+[2023-03-03 13:57:51]	Query from Client: ww.caluni.edu
+[2023-03-03 13:57:51]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:51]	Response sent: ERROR
 
-[2023-02-27 10:21:18]	Query from Client: www.iitus.edu
-[2023-02-27 10:21:18]	Client IP Address: ('127.0.0.1', 60491)
-[2023-02-27 10:21:18]	Response sent: 72.111.8.1
+[2023-03-03 13:57:57]	Query from Client: www.caluni.edu
+[2023-03-03 13:57:57]	Client IP Address: ('127.0.0.1', 34444)
+[2023-03-03 13:57:57]	Response sent: 91.142.200.1
+
+[2023-03-03 13:58:19]	Query from Client: smtp.bank.com
+[2023-03-03 13:58:19]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:58:19]	Response sent: 202.15.5.2
+
+[2023-03-03 13:58:28]	Query from Client: www.shp[.com
+[2023-03-03 13:58:28]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:58:28]	Response sent: ERROR
+
+[2023-03-03 13:58:34]	Query from Client: www.shop.com
+[2023-03-03 13:58:34]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:58:34]	Response sent: 133.54.5.1
+
+[2023-03-03 13:58:40]	Query from Client: ftp.store.com
+[2023-03-03 13:58:40]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:58:40]	Response sent: 143.11.5.23
+
+[2023-03-03 13:58:56]	Query from Client: sshd2.mynah.edu
+[2023-03-03 13:58:56]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:58:56]	Response sent: ERROR
+
+[2023-03-03 13:59:13]	Query from Client: www.brown.edj
+[2023-03-03 13:59:13]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:59:13]	Response sent: ERROR
+
+[2023-03-03 13:59:15]	Query from Client: www.brown.edu
+[2023-03-03 13:59:15]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:59:15]	Response sent: 192.13.5.1
+
+[2023-03-03 13:59:23]	Query from Client: vpn.cougar.edu
+[2023-03-03 13:59:23]	Client IP Address: ('127.0.0.1', 43774)
+[2023-03-03 13:59:23]	Response sent: 212.18.55.5
+
+[2023-03-03 13:59:42]	Query from Client: www.bank.com
+[2023-03-03 13:59:42]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 13:59:42]	Response sent: 202.15.5.1
+
+[2023-03-03 13:59:48]	Query from Client: smtp.shop.com
+[2023-03-03 13:59:48]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 13:59:48]	Response sent: 133.54.5.2
+
+[2023-03-03 13:59:54]	Query from Client: ftp.sptr.com
+[2023-03-03 13:59:54]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 13:59:54]	Response sent: ERROR
+
+[2023-03-03 13:59:58]	Query from Client: ftp.store.com
+[2023-03-03 13:59:58]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 13:59:58]	Response sent: 143.11.5.23
+
+[2023-03-03 14:00:08]	Query from Client: sshdq.mynah.edu
+[2023-03-03 14:00:08]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 14:00:08]	Response sent: ERROR
+
+[2023-03-03 14:00:12]	Query from Client: sshd1.mynah.edi
+[2023-03-03 14:00:12]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 14:00:12]	Response sent: ERROR
+
+[2023-03-03 14:00:17]	Query from Client: sshd1.mynah.edu
+[2023-03-03 14:00:17]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 14:00:17]	Response sent: 198.167.5.4
+
+[2023-03-03 14:00:22]	Query from Client: bpn.brown.edu
+[2023-03-03 14:00:22]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 14:00:22]	Response sent: ERROR
+
+[2023-03-03 14:00:27]	Query from Client: vpn.brown.edu
+[2023-03-03 14:00:27]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 14:00:27]	Response sent: 192.13.5.5
+
+[2023-03-03 14:00:31]	Query from Client: ftp.cougar.edu
+[2023-03-03 14:00:31]	Client IP Address: ('127.0.0.1', 47415)
+[2023-03-03 14:00:31]	Response sent: 212.18.35.3
 
