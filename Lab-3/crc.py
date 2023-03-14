@@ -27,6 +27,7 @@ def find_sub_mod2(window: List[str]) -> List[str]:
     Computes subtraction modulo 2 of the input string and G
 
     Arg: window (list[str]): Input string, of length same as G
+
     Returns: sub(window, G) (list[str]): Output, of length len(G)-1
     """
     if window[0] == '0': # nothing to subtract, just return all except first bit
@@ -43,6 +44,7 @@ def compute_checksum(msg: List[str]) -> List[str]:
     Computes the CRC checksum of msg wrt generator G
 
     Arg: msg (list[str]: The message before checksum appending)
+
     Returns: checksum (list[str]): The checksum to append before message transmission
     """
     padded_msg = msg + list('0'*(LEN_G-1)) # pad with zeros for final borrows
@@ -59,6 +61,7 @@ def list_to_str(tx_list: List[str]) -> str:
     Converts a list of characters to a string
 
     Arg: tx_list (list[str]): The list of characters to convert
+
     Returns: tx_str (str): The string form of tx_list
     """
     return ''.join(tx_list)
