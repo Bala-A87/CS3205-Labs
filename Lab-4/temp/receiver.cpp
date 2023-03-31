@@ -20,7 +20,31 @@ int *get_ack_packet(int *data_pkt, int seq_field_len) {
 	return ack_pkt;
 }
 
-void recv_packets(int sockfd, std::queue<int *> &buffer, std::queue<struct sockaddr_in> &senders, int pkt_len) {
+bool equal_seq_no(int *packet, int *seq_no, int seq_no_len) {
+	for(int i = 0; i < seq_no_len; i++)
+		if(packet[i] != seq_no[i])
+			return false;
+	return true;
+}
+
+void copy_seq_no(int *seq_no_field, int *pkt, int seq_no_len) {
+	for(int i = 0; i < seq_no_len; i++)
+		seq_no_field[i] = pkt[i];
+}
+
+void increment_seq_no(int *seq_no, int seq_no_len) {
+	int carry = 1;
+	for(int i = seq_no_len-1; i >= 0; i--) {
+		seq_no[i] = seq_no[i] + carry;
+		carry = 0;
+		if(seq_no[i] >= 256) {
+			seq_no[i] %= 256;
+			carry = 1;
+		}
+	}
+}
+
+void recv_packets(int sockfd, std::queue<int *> &buffer, std::queue<struct sockaddr_in> &senders, int pkt_len, int seq_field_len, int *next_pkt_exp, int *last_pkt_ackd, float pkt_drop_proba) {
 	int n;
 	struct sockaddr_in sender_addr;
 	socklen_t len = sizeof(sender_addr);
@@ -28,23 +52,39 @@ void recv_packets(int sockfd, std::queue<int *> &buffer, std::queue<struct socka
 		int *packet = new int[pkt_len];
 		n = recvfrom(sockfd, (int *)packet, pkt_len*sizeof(int), 0, (struct sockaddr *) &sender_addr, &len);
 		std::cout<<"Received packet "<<packet[0]<<std::endl; // remove later
-		buffer.push(packet);
-		senders.push(sender_addr);
+		bool accept = equal_seq_no(packet, next_pkt_exp, seq_field_len);
+		// buffer.push(packet);
+		bool drop_err = (rand() % ((int) (1 / pkt_drop_proba))) == 0;
+		if(!drop_err) {
+			senders.push(sender_addr); // add drop proba
+			if(accept) {
+				increment_seq_no(next_pkt_exp, seq_field_len);
+				buffer.push(get_ack_packet(packet, seq_field_len));
+				copy_seq_no(last_pkt_ackd, packet, seq_field_len);
+			}
+			else {
+				buffer.push(get_ack_packet(last_pkt_ackd, seq_field_len));
+			}
+		}
+		else 
+			std::cout<<"Oops! Packet "<<packet[0]<<" dropped!"<<std::endl; //remove later
+		free(packet);
 	}
 }
 
 void send_packets(int sockfd, std::queue<int *> &buffer, std::queue<struct sockaddr_in> &senders, int seq_field_len) {
 	while(true) {
 		if(!buffer.empty()) {
-			int *recvd_packet = buffer.front();
+			int *ack_msg = buffer.front();
 			struct sockaddr_in sender = senders.front();
 			socklen_t len = sizeof(sender);
 			buffer.pop();
 			senders.pop();
-			std::cout<<"Sending ACK message for "<<recvd_packet[0]<<std::endl; // remove later
-			int *ack_msg = get_ack_packet(recvd_packet, seq_field_len);
+			std::cout<<"Sending ACK message for "<<ack_msg[0]<<std::endl; // remove later
+			// int *ack_msg = get_ack_packet(recvd_packet, seq_field_len);
 			int n = sendto(sockfd, (const int *) ack_msg, seq_field_len*sizeof(int), 0, (const struct sockaddr *) &sender, len);
-			// std::cout<<std::strerror(errno)<<std::endl; ^---------handle
+			// std::cout<<std::strerror(errno)<<std::endl; 
+			free(ack_msg);
 		}
 	}
 }
@@ -111,7 +151,15 @@ int main(int argc, char *argv[]) {
 	int seq_no_len = info_buf[1];
 	free(info_buf);
 
-	std::thread thread_recv(recv_packets, sockfd, std::ref(recv_buffer), std::ref(senders), pkt_len);
+	int *next_pkt_exp = new int[seq_no_len];
+	for(int i = 0; i < seq_no_len; i++)
+		next_pkt_exp[i] = 0;
+
+	int *last_pkt_ackd = new int[seq_no_len];
+	for(int i = 0; i < seq_no_len; i++)
+		last_pkt_ackd[i] = 256;
+
+	std::thread thread_recv(recv_packets, sockfd, std::ref(recv_buffer), std::ref(senders), pkt_len, seq_no_len, next_pkt_exp, last_pkt_ackd, pkt_error_rate);
 	std::thread thread_send(send_packets, sockfd, std::ref(recv_buffer), std::ref(senders), seq_no_len);
 
 	thread_recv.join();

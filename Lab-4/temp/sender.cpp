@@ -25,28 +25,47 @@ void increment_seq_no(int *seq_no, int seq_no_len) {
 	} 
 }
 
-bool compare_seq_no(int *ack_pkt, int *data_pkt) {
-	for(int i = 0; i < 1024; i++) {
-		if(data_pkt[i] != ack_pkt[i])
+bool compare_seq_no(int *ack_pkt, int *data_pkt, int seq_no_len) {
+	for(int i = 0; i < seq_no_len; i++)
+		if(ack_pkt[i] != data_pkt[i])
 			return false;
-		if(data_pkt[i] == 256)
-			break;
-	}
 	return true;
 }
 
+bool seq_no_geq(int *pkt1, int *pkt2, int seq_no_len) {
+	for(int i = 0; i < seq_no_len; i++)
+		if(pkt1[i] == 256 || pkt2[i] == 256)
+			return false;
+		else if(pkt1[i] > pkt2[i])
+			return true;
+		else if(pkt1[i] < pkt2[i])
+			return false;
+	return true;
+}
+
+bool pkt_in_window(int *ack_pkt, int *window_start, int window_size, int seq_no_len) {
+	int *window_end = new int[seq_no_len];
+	int carry = window_size-1;
+	for(int i = seq_no_len-1; i >= 0; i--) {
+		window_end[i] = window_start[i] + carry;
+		carry = 0;
+		if(window_end[i] >= 256) {
+			carry = window_end[i] / 256;
+			window_end[i] %= 256;
+		}
+	}
+	bool ans = false;
+	if(seq_no_geq(ack_pkt, window_start, seq_no_len) && seq_no_geq(window_end, ack_pkt, seq_no_len))
+		ans = true;
+	else if(seq_no_geq(ack_pkt, window_start, seq_no_len) && (!seq_no_geq(window_end, ack_pkt, seq_no_len) && carry > 0))
+		ans = true;
+	else if((!seq_no_geq(ack_pkt, window_start, seq_no_len) && carry > 0) && seq_no_geq(window_end, ack_pkt, seq_no_len))
+		ans = true;
+	free(window_end);
+	return ans;
+}
+
 void gen_packets(std::queue<int *> &packets, int num, int pkt_gen_rate, int pkt_len, int seq_field_len, int max_buffer_size, int *curr_seq_no) {
-	// int MESSAGE[] = {17, 129, 200, 32}; 
-	// for(int i = 0; i < num; i++) {
-	// 	std::cout<<"Generating packet "<<i<<std::endl;
-	// 	int *msg = new int[6];
-	// 	msg[0] = i;
-	// 	msg[1] = 256;
-	// 	for(int j = 2; j < 6; j++)
-	// 		msg[j] = MESSAGE[j-2];
-	// 	packets.push(msg);
-	// 	usleep(1000000/pkt_gen_rate);
-	// }
 	int i = 0;
 	while(true) {
 		if(i >= num)
@@ -61,7 +80,7 @@ void gen_packets(std::queue<int *> &packets, int num, int pkt_gen_rate, int pkt_
 		packets.push(msg);
 		i++;
 		increment_seq_no(curr_seq_no, seq_field_len);
-		usleep(1000000/pkt_gen_rate);
+		// usleep(1000000/pkt_gen_rate);
 	}
 }
 
@@ -70,7 +89,7 @@ void send_packets(int sockfd, struct sockaddr_in server_addr, std::queue<int *> 
 		if(!buffer_out.empty() && retrans_buf.size() < window_size) {
 			int *msg = buffer_out.front();
 			buffer_out.pop();
-			std::cout<<"Sending packet "<<*msg<<std::endl;
+			std::cout<<"Sending packet "<<*msg<<std::endl; // remove later
 			socklen_t len = sizeof(server_addr);
 			sendto(sockfd, (int *) msg, pkt_len*sizeof(int), 0, (const struct sockaddr *) &server_addr, len);
 			retrans_buf.push(msg);
@@ -78,20 +97,30 @@ void send_packets(int sockfd, struct sockaddr_in server_addr, std::queue<int *> 
 	}
 }
 
-void recv_packets(int sockfd, std::queue<int *> &retrans_buf) {
-	int *buffer = new int[1024];
+void recv_packets(int sockfd, std::queue<int *> &retrans_buf, int seq_field_len) {
+	int *buffer = new int[seq_field_len];
 	int n;
 	struct sockaddr_in server_addr;
 	socklen_t len = sizeof(server_addr);
 	while(true) {
-		n = recvfrom(sockfd, (int *) buffer, 1024*sizeof(int), 0, (struct sockaddr *) &server_addr, &len);
-		while(!retrans_buf.empty()) {
-			int *ackd_pkt = retrans_buf.front();
-			retrans_buf.pop();
-			if(compare_seq_no(buffer, ackd_pkt))
-				break;
+		n = recvfrom(sockfd, (int *) buffer, seq_field_len*sizeof(int), 0, (struct sockaddr *) &server_addr, &len);
+		if(!retrans_buf.empty()) {
+			if(pkt_in_window(buffer, retrans_buf.front(), retrans_buf.size(), seq_field_len)) {
+				while(!retrans_buf.empty()) {
+					int *ackd_pkt = retrans_buf.front();
+					retrans_buf.pop();
+					if(compare_seq_no(buffer, ackd_pkt, seq_field_len))
+						break;
+				}
+			}
 		}
-		std::cout<<"Received ACK for "<<*buffer<<std::endl; 
+		// while(!retrans_buf.empty()) { // handle properly by checking if the ackd packet is in the window
+		// 	int *ackd_pkt = retrans_buf.front();
+		// 	retrans_buf.pop();
+		// 	if(compare_seq_no(buffer, ackd_pkt))
+		// 		break;
+		// }
+		std::cout<<"Received ACK for "<<*buffer<<std::endl; // remove later
 	}
 }
 
@@ -177,7 +206,7 @@ int main(int argc, char *argv[]) {
 
 	std::thread thread_gen(gen_packets, std::ref(packets), 9, pkt_gen_rate, pkt_len, seq_no_len, max_buf_size, seq_no_gen);
 	std::thread thread_send(send_packets, sockfd, servaddr, std::ref(packets), pkt_len, std::ref(retrans_buffer), window_size);
-	std::thread thread_recv(recv_packets, sockfd, std::ref(retrans_buffer));
+	std::thread thread_recv(recv_packets, sockfd, std::ref(retrans_buffer), seq_no_len);
 
 	thread_gen.join();
 	thread_send.join();
