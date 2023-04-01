@@ -13,113 +13,135 @@
 #define PORT	 8080
 #define MAXLINE 1024
 
-void increment_seq_no(int *seq_no, int seq_no_len) {
-	int carry = 1;
-	for(int i = seq_no_len-1; i >= 0; i--) {
-		seq_no[i] = seq_no[i] + carry;
-		carry = 0;
-		if(seq_no[i] >= 256) {
-			seq_no[i] %= 256;
-			carry = 1;
-		}
-	} 
+bool seq_no_geq(int seq1, int seq2) {
+	if(seq1 == 256 || seq2 == 256)
+		return false;
+	else 
+		return seq1 >= seq2;
 }
 
-bool compare_seq_no(int *ack_pkt, int *data_pkt, int seq_no_len) {
-	for(int i = 0; i < seq_no_len; i++)
-		if(ack_pkt[i] != data_pkt[i])
-			return false;
-	return true;
-}
-
-bool seq_no_geq(int *pkt1, int *pkt2, int seq_no_len) {
-	for(int i = 0; i < seq_no_len; i++)
-		if(pkt1[i] == 256 || pkt2[i] == 256)
-			return false;
-		else if(pkt1[i] > pkt2[i])
-			return true;
-		else if(pkt1[i] < pkt2[i])
-			return false;
-	return true;
-}
-
-bool pkt_in_window(int *ack_pkt, int *window_start, int window_size, int seq_no_len) {
-	int *window_end = new int[seq_no_len];
-	int carry = window_size-1;
-	for(int i = seq_no_len-1; i >= 0; i--) {
-		window_end[i] = window_start[i] + carry;
-		carry = 0;
-		if(window_end[i] >= 256) {
-			carry = window_end[i] / 256;
-			window_end[i] %= 256;
-		}
+bool pkt_in_window(int ack_seq_no, int window_start, int window_size) {
+	int window_end = window_start + window_size;
+	int carry = 0;
+	if(window_end >= 256) {
+		carry =  window_end / 256;
+		window_end %= 256;
 	}
 	bool ans = false;
-	if(seq_no_geq(ack_pkt, window_start, seq_no_len) && seq_no_geq(window_end, ack_pkt, seq_no_len))
+	if(seq_no_geq(ack_seq_no, window_start) && seq_no_geq(window_end, ack_seq_no))
 		ans = true;
-	else if(seq_no_geq(ack_pkt, window_start, seq_no_len) && (!seq_no_geq(window_end, ack_pkt, seq_no_len) && carry > 0))
+	else if(seq_no_geq(ack_seq_no, window_start) && (!seq_no_geq(window_end, ack_seq_no) && carry > 0))
 		ans = true;
-	else if((!seq_no_geq(ack_pkt, window_start, seq_no_len) && carry > 0) && seq_no_geq(window_end, ack_pkt, seq_no_len))
+	else if((!seq_no_geq(ack_seq_no, window_start) && carry > 0) && seq_no_geq(window_end, ack_seq_no))
 		ans = true;
-	free(window_end);
 	return ans;
 }
 
-void gen_packets(std::queue<int *> &packets, int num, int pkt_gen_rate, int pkt_len, int seq_field_len, int max_buffer_size, int *curr_seq_no) {
+int get_timeout_time(int pkts_sent, long long rtt_sum, long long rtt_count) {
+	if(pkts_sent < 10)
+		return 100000;
+	return 2 * (rtt_sum / rtt_count);
+}
+
+void wait_for_timeout(long long wait_time_us, bool &timeout, std::thread **wait_threads, int seq_no, bool *complete) {
+	usleep(wait_time_us);
+	if(std::this_thread::get_id() == wait_threads[seq_no]->get_id() && !complete[seq_no])
+		timeout = true;
+}
+
+void gen_packets(std::queue<int *> &packets, int num, int pkt_gen_rate, int pkt_len, int max_buffer_size, int &curr_seq_no, bool &stop) {
 	int i = 0;
-	while(true) {
-		if(i >= num)
+	while(!stop) {
+		if(i >= num) {
+			stop = true;
 			break;
+		}
 		int *msg = new int[pkt_len];
-		for(int j = 0; j < seq_field_len; j++)
-			msg[j] = curr_seq_no[j];
-		msg[seq_field_len] = 256;
-		for(int j = seq_field_len+1; j < pkt_len; j++)
+		msg[0] = curr_seq_no;
+		for(int j = 1; j < pkt_len; j++)
 			msg[j] = rand()%256;
 		while(packets.size() >= max_buffer_size);
 		packets.push(msg);
 		i++;
-		increment_seq_no(curr_seq_no, seq_field_len);
-		// usleep(1000000/pkt_gen_rate);
+		curr_seq_no++;
+		usleep(1000000/pkt_gen_rate);
 	}
+
 }
 
-void send_packets(int sockfd, struct sockaddr_in server_addr, std::queue<int *> &buffer_out, int pkt_len, std::queue<int *> &retrans_buf, int window_size) {
-	while(true) {
+void send_packets(int sockfd, struct sockaddr_in server_addr, std::queue<int *> &buffer_out, int pkt_len, std::queue<int *> &retrans_buf, int window_size, std::chrono::_V2::system_clock::time_point *start_time, bool &timeout, std::thread **wait_threads, bool *complete, int &pkts_sent, long long &rtt_sum, long long &rtt_count, bool &stop, int *retrans_attempts) {
+	while(!stop) {
+		if(timeout) {
+			for(int i = 0; i < retrans_buf.size(); i++) {
+				int *msg = retrans_buf.front();
+				retrans_buf.pop();
+				if(retrans_attempts[*msg] > 5) {
+					std::cout<<"Packet "<<*msg<<" has been retransmitted 5 times, ending connection"<<std::endl;
+					stop = true;
+					break;
+				}
+				std::cout<<"Retransmitting packet "<<*msg<<std::endl; // remove later
+				socklen_t len = sizeof(server_addr);
+				complete[*msg] = false;
+				sendto(sockfd, (int *) msg, pkt_len*sizeof(int), 0, (const struct sockaddr *) &server_addr, len);
+				start_time[*msg] = std::chrono::high_resolution_clock::now();
+				wait_threads[*msg] = new std::thread(wait_for_timeout, get_timeout_time(pkts_sent, rtt_sum, rtt_count), std::ref(timeout), wait_threads, *msg, complete);
+				pkts_sent++;
+				retrans_attempts[*msg]++;
+				retrans_buf.push(msg);
+			}
+			timeout = false;
+		}
+		if(stop)
+			break;
 		if(!buffer_out.empty() && retrans_buf.size() < window_size) {
 			int *msg = buffer_out.front();
 			buffer_out.pop();
 			std::cout<<"Sending packet "<<*msg<<std::endl; // remove later
 			socklen_t len = sizeof(server_addr);
+			complete[*msg] = false;
+			retrans_attempts[*msg] = 0;
 			sendto(sockfd, (int *) msg, pkt_len*sizeof(int), 0, (const struct sockaddr *) &server_addr, len);
+			start_time[*msg] = std::chrono::high_resolution_clock::now();
+			wait_threads[*msg] = new std::thread(wait_for_timeout, get_timeout_time(pkts_sent, rtt_sum, rtt_count), std::ref(timeout), wait_threads, *msg, complete);
+			pkts_sent++;
 			retrans_buf.push(msg);
 		}
 	}
+	int *stop_msg = new int[pkt_len];
+	stop_msg[0] = 256;
+	socklen_t len = sizeof(server_addr);
+	sendto(sockfd, (int *) stop_msg, pkt_len*sizeof(int), 0, (const struct sockaddr *) &server_addr, len);
+	sleep(1);
+	free(stop_msg);
 }
 
-void recv_packets(int sockfd, std::queue<int *> &retrans_buf, int seq_field_len) {
-	int *buffer = new int[seq_field_len];
+void recv_packets(int sockfd, std::queue<int *> &retrans_buf, std::chrono::_V2::system_clock::time_point *end_time, std::chrono::_V2::system_clock::time_point *start_time, long long &rtt_sum, long long &rtt_count, bool *complete, bool &stop) {
+	int *buffer = new int;
 	int n;
 	struct sockaddr_in server_addr;
 	socklen_t len = sizeof(server_addr);
-	while(true) {
-		n = recvfrom(sockfd, (int *) buffer, seq_field_len*sizeof(int), 0, (struct sockaddr *) &server_addr, &len);
+	while(!stop) {
+		n = recvfrom(sockfd, (int *) buffer, sizeof(int), 0, (struct sockaddr *) &server_addr, &len);
+		if(*buffer == 256) {
+			stop = true;
+			break;
+		}
 		if(!retrans_buf.empty()) {
-			if(pkt_in_window(buffer, retrans_buf.front(), retrans_buf.size(), seq_field_len)) {
+			if(pkt_in_window(*buffer, retrans_buf.front()[0], retrans_buf.size())) {
 				while(!retrans_buf.empty()) {
 					int *ackd_pkt = retrans_buf.front();
+					end_time[*ackd_pkt] = std::chrono::high_resolution_clock::now();
+					complete[*ackd_pkt] = true;
+					std::cout<<"Time for ACK "<<*ackd_pkt<<": "<<(long long)std::chrono::duration_cast<std::chrono::microseconds>(end_time[*ackd_pkt] - start_time[*ackd_pkt]).count()<<std::endl;
+					rtt_sum += (long long)std::chrono::duration_cast<std::chrono::microseconds>(end_time[*ackd_pkt] - start_time[*ackd_pkt]).count();
+					rtt_count++;
 					retrans_buf.pop();
-					if(compare_seq_no(buffer, ackd_pkt, seq_field_len))
+					if(ackd_pkt[0] == buffer[0])
 						break;
 				}
 			}
 		}
-		// while(!retrans_buf.empty()) { // handle properly by checking if the ackd packet is in the window
-		// 	int *ackd_pkt = retrans_buf.front();
-		// 	retrans_buf.pop();
-		// 	if(compare_seq_no(buffer, ackd_pkt))
-		// 		break;
-		// }
 		std::cout<<"Received ACK for "<<*buffer<<std::endl; // remove later
 	}
 }
@@ -136,8 +158,7 @@ int main(int argc, char *argv[]) {
 	const char *hello = "Hello from client";
 	struct sockaddr_in	 servaddr;
 	std::queue<int *> packets, retrans_buffer;
-	int seq_no_len = 0;
-	long long max_window_size = 1;
+	bool stop_comm = false;
 
 	for(int i = 1; i < argc; i++) {
 		if(!strcmp(argv[i], "-d")) {
@@ -173,13 +194,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	while(max_window_size < window_size) {
-		seq_no_len++;
-		max_window_size *= 256;
-	}
-	int *seq_no_gen = new int[seq_no_len];
-	for(int i = 0; i < seq_no_len; i++)
-		seq_no_gen[i] = 0;
+	int seq_no = 0;
 
 	// Creating socket file descriptor
 	if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
@@ -194,19 +209,30 @@ int main(int argc, char *argv[]) {
 	servaddr.sin_port = htons(recvr_port);
 	servaddr.sin_addr.s_addr = INADDR_ANY;
 
-	int *info_pkt = new int[2];
-	info_pkt[0] = pkt_len;
-	info_pkt[1] = seq_no_len;
+	int *info_pkt = new int;
+	*info_pkt = pkt_len;
 	socklen_t len = sizeof(servaddr);
-	sendto(sockfd, (int *)info_pkt, 2*sizeof(int), 0, (const sockaddr *) &servaddr, len);
+	sendto(sockfd, (int *)info_pkt, sizeof(int), 0, (const sockaddr *) &servaddr, len);
 
 	sleep(1);
 
 	free(info_pkt);
+	std::chrono::_V2::system_clock::time_point start_time[256], end_time[256];
+	std::thread *timeout_threads[256];
+	long long rtt_sum = 0;
+	long long rtt_count = 0;
+	bool timeout = false;
+	bool complete[256];
+	int retrans_attempts[256];
+	for(int i = 0; i < 256; i++) {
+		complete[i] = 256;
+		retrans_attempts[i] = 0;
+	}
+	int pkts_sent = 0;
 
-	std::thread thread_gen(gen_packets, std::ref(packets), 9, pkt_gen_rate, pkt_len, seq_no_len, max_buf_size, seq_no_gen);
-	std::thread thread_send(send_packets, sockfd, servaddr, std::ref(packets), pkt_len, std::ref(retrans_buffer), window_size);
-	std::thread thread_recv(recv_packets, sockfd, std::ref(retrans_buffer), seq_no_len);
+	std::thread thread_gen(gen_packets, std::ref(packets), max_pkts, pkt_gen_rate, pkt_len, max_buf_size, std::ref(seq_no), std::ref(stop_comm));
+	std::thread thread_send(send_packets, sockfd, servaddr, std::ref(packets), pkt_len, std::ref(retrans_buffer), window_size, start_time, std::ref(timeout), timeout_threads, complete, std::ref(pkts_sent), std::ref(rtt_sum), std::ref(rtt_count), std::ref(stop_comm), retrans_attempts);
+	std::thread thread_recv(recv_packets, sockfd, std::ref(retrans_buffer), end_time, start_time, std::ref(rtt_sum), std::ref(rtt_count), complete, std::ref(stop_comm));
 
 	thread_gen.join();
 	thread_send.join();
