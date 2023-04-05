@@ -1,12 +1,10 @@
-all:
-	g++ ReceiverGBN.cpp -o ReceiverGBN
-	g++ SenderGBN.cpp -o SenderGBN
+all: SenderGBN ReceiverGBN
 
-receiver:
-	g++ ReceiverGBN.cpp -o ReceiverGBN
+SenderGBN: SenderGBN.cpp
+	g++ $< -o $@
 
-sender:
-	g++ SenderGBN.cpp -o SenderGBN
+ReceiverGBN: ReceiverGBN.cpp
+	g++ $< -o $@
 
 clean:
-	rm ReceiverGBN SenderGBN
+	rm -f SenderGBN ReceiverGBN 
