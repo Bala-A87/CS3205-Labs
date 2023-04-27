@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, signal
 
 nodes = None            # -n
 infile = None           # -f
@@ -29,9 +29,16 @@ while i < len(sys.argv):
         i += 1
     i += 1
 
+children = []
 for node in range(nodes):
     pid = os.fork()
     if pid == 0:
         os.execlp('python3', 'python3', 'ospf.py', '-i', str(node), '-f', infile, '-o', outfile+f'-{node}.txt', '-h', str(hello_interval), '-a', str(lsa_interval), '-s', str(spf_interval))
+    else:
+        children.append(pid)
 
-os.wait()
+kill_signal = input()
+
+if kill_signal == 'stop':
+    for child in children:
+        os.kill(child, signal.SIGTERM)
