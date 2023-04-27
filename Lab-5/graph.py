@@ -9,6 +9,9 @@ class Graph():
         self.graph[node1][node2] = weight
         self.graph[node2][node1] = weight
 
+    def getEdgeWeight(self, node1, node2):
+        return self.graph[node1][node2]
+
 	# A utility function to find the vertex with
 	# minimum distance value, from the set of vertices
 	# not yet included in shortest path tree
