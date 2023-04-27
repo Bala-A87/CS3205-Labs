@@ -6,6 +6,7 @@ outfile = None          # -o
 hello_interval = 1      # -h
 lsa_interval = 5        # -a
 spf_interval = 20       # -s
+debug = False           # -d
 
 i = 1
 while i < len(sys.argv):
@@ -27,13 +28,18 @@ while i < len(sys.argv):
     elif sys.argv[i] == '-s':
         spf_interval = int(sys.argv[i+1])
         i += 1
+    elif sys.argv[i] == '-d':
+        debug = True
     i += 1
 
 children = []
 for node in range(nodes):
     pid = os.fork()
     if pid == 0:
-        os.execlp('python3', 'python3', 'ospf.py', '-i', str(node), '-f', infile, '-o', outfile+f'-{node}.txt', '-h', str(hello_interval), '-a', str(lsa_interval), '-s', str(spf_interval))
+        if debug:
+            os.execlp('python3', 'python3', 'ospf.py', '-i', str(node), '-f', infile, '-o', outfile+f'-{node}.txt', '-h', str(hello_interval), '-a', str(lsa_interval), '-s', str(spf_interval), '-d')
+        else:
+            os.execlp('python3', 'python3', 'ospf.py', '-i', str(node), '-f', infile, '-o', outfile+f'-{node}.txt', '-h', str(hello_interval), '-a', str(lsa_interval), '-s', str(spf_interval))
     else:
         children.append(pid)
 

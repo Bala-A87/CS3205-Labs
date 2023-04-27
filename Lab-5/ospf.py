@@ -6,7 +6,8 @@ import json
 from numpy.random import default_rng
 import numpy as np
 from graph import Graph
-from threading import Thread
+from threading import Thread, Lock
+from timeit import default_timer as timer
 
 id = None               # -i
 infile = None           # -f
@@ -14,6 +15,7 @@ outfile = None          # -o
 hello_interval = 1      # -h
 lsa_interval = 5        # -a
 spf_interval = 20       # -s
+debug = False           # -d
 
 i = 1
 while i < len(sys.argv):
@@ -35,9 +37,12 @@ while i < len(sys.argv):
     elif sys.argv[i] == '-s':
         spf_interval = int(sys.argv[i+1])
         i += 1
+    elif sys.argv[i] == '-d':
+        debug = True
     i += 1
 
 BUFSIZE = 1024
+graph_mutex = Lock()
 
 def add_log(log_str: str, file: str = outfile):
     with open(file, 'a') as f:
@@ -49,7 +54,8 @@ def send_hello(neighbors: List[bool], interval: int, socket_comm: socket.socket)
         time.sleep(interval)
         for neighbor, is_neighbor in enumerate(neighbors):
             if is_neighbor:
-                add_log(f'Sending HELLO packet to {neighbor}')
+                if debug:
+                    add_log(f'Sending HELLO packet to {neighbor}')
                 socket_comm.sendto(str.encode(json.dumps(['HELLO', id])), ('127.0.0.1', 10000+neighbor))
 
 def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[int], local_graph: Graph, neighbors: List[bool], last_seq_no_recvd: List[int]):
@@ -60,7 +66,8 @@ def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[in
 
         if msg[0] == 'HELLO':
             nbr_id = msg[1]
-            add_log(f'Received HELLO from {nbr_id}')
+            if debug:
+                add_log(f'Received HELLO from {nbr_id}')
             link_wt = int(default_rng().integers(min_wts[nbr_id], max_wts[nbr_id]+1))
             helloreply = ['HELLOREPLY', id, nbr_id, link_wt]
             socket_comm.sendto(str.encode(json.dumps(helloreply)), nbr_addr)
@@ -68,25 +75,34 @@ def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[in
         elif msg[0] == 'HELLOREPLY':
             nbr_id = msg[1]
             link_wt = msg[3]
-            add_log(f'Received HELLOREPLY from {nbr_id}, link weight = {link_wt}')
+            if debug:
+                add_log(f'Received HELLOREPLY from {nbr_id}, link weight = {link_wt}')
+            graph_mutex.acquire()
             local_graph.addEdge(id, nbr_id, link_wt)
+            graph_mutex.release()
         
         elif msg[0] == 'LSA':
             src_id = msg[1]
             src_seq_no = msg[2]
             # verify if greater than prev seq num from this src
             if src_seq_no > last_seq_no_recvd[src_id]:
+                if debug:
+                    add_log(f'Received LSA packet #{src_seq_no} from {src_id}')
                 last_seq_no_recvd[src_id] = src_seq_no
                 entries = msg[3]
+                graph_mutex.acquire()
                 for entry in range(entries):
                     scr_nbr_id = msg[2*entry + 4]
                     src_nbr_wt = msg[2*entry + 5]
                     local_graph.addEdge(src_id, scr_nbr_id, src_nbr_wt)
+                graph_mutex.release()
 
                 for nbr_id, is_nbr in enumerate(neighbors):
                     if nbr_id == src_id:
                         continue
                     if is_nbr:
+                        if debug:
+                            add_log(f'Forwarding LSA packet #{src_seq_no} from {src_id} to {nbr_id}')
                         socket_comm.sendto(str.encode(json.dumps(msg)), ('127.0.0.1', 10000+nbr_id))
 
 def send_lsa(neighbors: List[bool], local_graph: Graph, interval: int):
@@ -101,18 +117,40 @@ def send_lsa(neighbors: List[bool], local_graph: Graph, interval: int):
         time.sleep(interval)
         last_seq_no += 1
         lsa_pkt = lsa_pkt_base + [last_seq_no, num_entries]
+        graph_mutex.acquire()
         for nbr_id, is_nbr in enumerate(neighbors):
             if is_nbr:
                 nbr_link_wt = local_graph.getEdgeWeight(id, nbr_id)
                 lsa_pkt += [nbr_id, nbr_link_wt]
-        
+        graph_mutex.release()
+
         for nbr_id, is_nbr in enumerate(neighbors):
             if is_nbr:
+                if debug:
+                    add_log(f'Sending LSA packet #{last_seq_no} to {nbr_id}')
                 socket_comm.sendto(str.encode(json.dumps(lsa_pkt)), ('127.0.0.1', 10000+nbr_id))
 
-def compute_shortest_paths(graph: Graph, outfile: str):
-    pass
-
+def compute_shortest_paths(graph: Graph, interval: int, start_time: float):
+    while True:
+        time.sleep(interval)
+        graph_mutex.acquire()
+        dists, hops = local_graph.dijkstra(id)
+        graph_mutex.release()
+        curr_time = int(timer() - start_time)
+        add_log(f'Routing table for Node No. {id} at Time {curr_time}')
+        add_log('Destination\tPath\t\t\tCost')
+        for dest in range(graph.V):
+            if dest == id:
+                continue
+            padding = ''
+            rev_path = []
+            next_hop = dest
+            while next_hop is not None:
+                rev_path += [str(next_hop)]
+                next_hop = hops[next_hop]
+            path = '-'.join(rev_path[::-1])
+            padding = '  '*(2*graph.V - len(path))
+            add_log(f'{dest}\t\t\t{path+padding}\t{dists[dest]}')
 
 
     
@@ -147,13 +185,22 @@ local_graph = Graph(n)
 port = 10000 + id
 socket_comm = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 socket_comm.bind(('127.0.0.1', port))
-add_log(f'Listening on port {port}')
+if debug:
+    add_log(f'Listening on port {port}')
+
+start_time = timer()
 
 hello_thread = Thread(target=send_hello, args=[neighbors, hello_interval, socket_comm])
 listen_thread = Thread(target=listen_msgs, args=[socket_comm, min_wts, max_wts, local_graph, neighbors, [0]*n])
+lsa_thread = Thread(target=send_lsa, args=[neighbors, local_graph, lsa_interval])
+spf_thread = Thread(target=compute_shortest_paths, args=[local_graph, spf_interval, start_time])
 
 hello_thread.start()
 listen_thread.start()
+lsa_thread.start()
+spf_thread.start()
 
 hello_thread.join()
 listen_thread.join()
+lsa_thread.join()
+spf_thread.join()
