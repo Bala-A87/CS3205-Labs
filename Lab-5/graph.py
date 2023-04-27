@@ -59,5 +59,6 @@ class Graph():
                 sptSet[v] == False and
                 dist[v] > dist[u] + self.graph[u][v]):
                     dist[v] = dist[u] + self.graph[u][v]
+                    prev[v] = u
 
         return dist, prev
