@@ -1,0 +1,30 @@
+Routing table for Node No. 4 at Time 20
+Destination    Path     Cost
+0              4-2-0    8
+1              4-1      9
+2              4-2      7
+3              4-3      8
+5              4-5      5
+6              4-7-6    8
+7              4-7      2
+
+Routing table for Node No. 4 at Time 40
+Destination    Path     Cost
+0              4-2-0    8
+1              4-1      9
+2              4-2      7
+3              4-3      8
+5              4-5      5
+6              4-7-6    8
+7              4-7      2
+
+Routing table for Node No. 4 at Time 60
+Destination    Path     Cost
+0              4-2-0    8
+1              4-1      9
+2              4-2      7
+3              4-3      8
+5              4-5      5
+6              4-7-6    8
+7              4-7      2
+
