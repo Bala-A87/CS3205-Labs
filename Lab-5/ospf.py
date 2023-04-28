@@ -4,7 +4,6 @@ from typing import List
 import time
 import json
 from numpy.random import default_rng
-import numpy as np
 from graph import Graph
 from threading import Thread, Lock
 from timeit import default_timer as timer
@@ -138,19 +137,28 @@ def compute_shortest_paths(graph: Graph, interval: int, start_time: float):
         graph_mutex.release()
         curr_time = int(timer() - start_time)
         add_log(f'Routing table for Node No. {id} at Time {curr_time}')
-        add_log('Destination\tPath\t\t\tCost')
+        to_log = [None] * graph.V
+        dest_length = len('Destination')
+        path_length = len('Path')
+        to_log[0] = ['Destination', 'Path', 'Cost']
+        itr = 1
         for dest in range(graph.V):
             if dest == id:
                 continue
-            padding = ''
             rev_path = []
             next_hop = dest
             while next_hop is not None:
                 rev_path += [str(next_hop)]
                 next_hop = hops[next_hop]
             path = '-'.join(rev_path[::-1])
-            padding = '  '*(2*graph.V - len(path))
-            add_log(f'{dest}\t\t\t{path+padding}\t{dists[dest]}')
+            dest_length = max(dest_length, len(str(dest)))
+            path_length = max(path_length, len(path))
+            to_log[itr] = [str(dest), path, str(dists[dest])]
+            itr += 1
+        
+        for log_str in to_log:
+            add_log(log_str[0] + (dest_length+4-len(log_str[0]))*' ' + log_str[1] + (path_length+4-len(log_str[1]))*' ' + log_str[2])
+        add_log('')
 
 
     
