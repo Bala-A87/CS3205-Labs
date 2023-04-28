@@ -18,7 +18,7 @@ class Graph():
     def minDistance(self, dist, sptSet):
 
         # Initialize minimum distance for next node
-        min = 1e7
+        min = 1e7 + 1
 
         # Search not nearest vertex not in the
         # shortest path tree
