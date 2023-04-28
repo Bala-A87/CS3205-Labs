@@ -19,4 +19,12 @@ Brief summaries of the assignments are provided below, and comprehensive problem
 3. [Cyclic Redundancy Check](./Lab-3/)
     - CRC algorithm implemented to determine checksum
     - Investigated properties regarding independent errors and bursty errors detection
+
+4. [Go-Back-N Protocol](./Lab-4/)
+    - GBN protocol for reliable transmission implemented with UDP
+    - A sender and a receiver, for generating and sending messages, and acknowledging them
+
+5. [OSPF Routing Algorithm](./Lab-5/)
+    - OSPF protocol for topology construction and path-finding implemented with UDP
+    - Multiple router instances periodically communicating to determine and advertise link states, and computing paths
     
