@@ -1,3 +1,15 @@
+# NAME: Balakrishnan A
+# Roll Number: CS20B012
+# Course: CS3205 Jan. 2023 semester
+# Lab number: 5
+# Date of submission: Apr 28, 2023
+# I confirm that the source file is entirely written by me without
+# resorting to any dishonest means.
+# Website(s) that I used for basic socket programming code are:
+# URL(s): None
+# Website used for Dijkstra algorithm code: 
+# https://www.geeksforgeeks.org/python-program-for-dijkstras-shortest-path-algorithm-greedy-algo-7/
+
 class Graph():
 
     def __init__(self, num_vertices):

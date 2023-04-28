@@ -1,13 +1,23 @@
-import sys
-import socket
+# NAME: Balakrishnan A
+# Roll Number: CS20B012
+# Course: CS3205 Jan. 2023 semester
+# Lab number: 5
+# Date of submission: Apr 28, 2023
+# I confirm that the source file is entirely written by me without
+# resorting to any dishonest means.
+# Website(s) that I used for basic socket programming code are:
+# URL(s): None
+# Website used for Dijkstra algorithm code: 
+# https://www.geeksforgeeks.org/python-program-for-dijkstras-shortest-path-algorithm-greedy-algo-7/
+
+import sys, socket, time, json
 from typing import List
-import time
-import json
 from numpy.random import default_rng
 from graph import Graph
 from threading import Thread, Lock
 from timeit import default_timer as timer
 
+# Command line arguments
 id = None               # -i
 infile = None           # -f
 outfile = None          # -o
@@ -47,39 +57,46 @@ def add_log(log_str: str, file: str = outfile):
     with open(file, 'a') as f:
         f.write(log_str + '\n')
 
-
+# Function implemented by thread sending HELLO packets
 def send_hello(neighbors: List[bool], interval: int, socket_comm: socket.socket):
     while True:
-        time.sleep(interval)
+        time.sleep(interval) # sleep for hello interval seconds
         for neighbor, is_neighbor in enumerate(neighbors):
             if is_neighbor:
                 if debug:
                     add_log(f'Sending HELLO packet to {neighbor}')
                 socket_comm.sendto(str.encode(json.dumps(['HELLO', id])), ('127.0.0.1', 10000+neighbor))
+                # Send HELLO packet to all neighbors
 
+# Function implemented by thread listening to all packets
 def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[int], local_graph: Graph, neighbors: List[bool], last_seq_no_recvd: List[int]):
     while True:
         msg_addr = socket_comm.recvfrom(BUFSIZE) 
         msg = json.loads(msg_addr[0].decode())
         nbr_addr = msg_addr[1]
 
+        # HELLO packet
         if msg[0] == 'HELLO':
             nbr_id = msg[1]
             if debug:
                 add_log(f'Received HELLO from {nbr_id}')
+            # Send random link weight with HELLOREPLY
             link_wt = int(default_rng().integers(min_wts[nbr_id], max_wts[nbr_id]+1))
             helloreply = ['HELLOREPLY', id, nbr_id, link_wt]
             socket_comm.sendto(str.encode(json.dumps(helloreply)), nbr_addr)
 
+        # HELLOREPLY packet
         elif msg[0] == 'HELLOREPLY':
             nbr_id = msg[1]
             link_wt = msg[3]
             if debug:
                 add_log(f'Received HELLOREPLY from {nbr_id}, link weight = {link_wt}')
+            # Update graph link weight to match received link weight
             graph_mutex.acquire()
             local_graph.addEdge(id, nbr_id, link_wt)
             graph_mutex.release()
         
+        # LSA packet
         elif msg[0] == 'LSA':
             src_id = msg[1]
             src_seq_no = msg[2]
@@ -88,6 +105,7 @@ def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[in
                 if debug:
                     add_log(f'Received LSA packet #{src_seq_no} from {src_id}')
                 last_seq_no_recvd[src_id] = src_seq_no
+                # Update graph links as specified in the LSA packet
                 entries = msg[3]
                 graph_mutex.acquire()
                 for entry in range(entries):
@@ -96,6 +114,7 @@ def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[in
                     local_graph.addEdge(src_id, scr_nbr_id, src_nbr_wt)
                 graph_mutex.release()
 
+                # Forward LSA packet to all neighbors except the one who sent here 
                 for nbr_id, is_nbr in enumerate(neighbors):
                     if nbr_id == src_id:
                         continue
@@ -104,6 +123,7 @@ def listen_msgs(socket_comm: socket.socket, min_wts: List[int], max_wts: List[in
                             add_log(f'Forwarding LSA packet #{src_seq_no} from {src_id} to {nbr_id}')
                         socket_comm.sendto(str.encode(json.dumps(msg)), ('127.0.0.1', 10000+nbr_id))
 
+# Function implemented by thread sending LSA packets
 def send_lsa(neighbors: List[bool], local_graph: Graph, interval: int):
     last_seq_no = 0
     lsa_pkt_base = ['LSA', id]
@@ -113,9 +133,10 @@ def send_lsa(neighbors: List[bool], local_graph: Graph, interval: int):
             num_entries += 1
     
     while True:
-        time.sleep(interval)
-        last_seq_no += 1
+        time.sleep(interval) # sleep for lsa interval seconds
+        last_seq_no += 1 # keep incrementing LSA packet sequence number
         lsa_pkt = lsa_pkt_base + [last_seq_no, num_entries]
+        # get all links to neighbors to advertise
         graph_mutex.acquire()
         for nbr_id, is_nbr in enumerate(neighbors):
             if is_nbr:
@@ -123,21 +144,25 @@ def send_lsa(neighbors: List[bool], local_graph: Graph, interval: int):
                 lsa_pkt += [nbr_id, nbr_link_wt]
         graph_mutex.release()
 
+        # Send LSA packet to all neighbors
         for nbr_id, is_nbr in enumerate(neighbors):
             if is_nbr:
                 if debug:
                     add_log(f'Sending LSA packet #{last_seq_no} to {nbr_id}')
                 socket_comm.sendto(str.encode(json.dumps(lsa_pkt)), ('127.0.0.1', 10000+nbr_id))
 
+# Function implemented by thread computing shortest paths 
 def compute_shortest_paths(graph: Graph, interval: int, start_time: float):
     while True:
-        time.sleep(interval)
+        time.sleep(interval) # sleep for spf interval seconds
+        # Compute all shortest paths starting at this router
         graph_mutex.acquire()
         dists, hops = local_graph.dijkstra(id)
         graph_mutex.release()
         curr_time = int(timer() - start_time)
         add_log(f'Routing table for Node No. {id} at Time {curr_time}')
         to_log = [None] * graph.V
+        # For printing text formatted by aligning
         dest_length = len('Destination')
         path_length = len('Path')
         to_log[0] = ['Destination', 'Path', 'Cost']
@@ -167,18 +192,19 @@ min_wts = None
 max_wts = None
 n, m = None, None
 
+# Read infile to get the information about the neighbors 
 with open(infile, 'r') as f:
     infile_lines = f.read().split('\n')
 for line_num, line in enumerate(infile_lines):
     split_line = line.split()
     if split_line == []:
         continue
-    if len(split_line) == 2:
+    if len(split_line) == 2: # get information about number of nodes and edges
         n, m = int(split_line[0]), int(split_line[1])
         neighbors = [False] * n
         min_wts = [None] * n
         max_wts = [None] * n
-    else:
+    else: # get information about link if one of the nodes is this router
         if int(split_line[0]) == id:
             neighbors[int(split_line[1])] = True
             min_wts[int(split_line[1])] = int(split_line[2])
@@ -188,7 +214,7 @@ for line_num, line in enumerate(infile_lines):
             min_wts[int(split_line[0])] = int(split_line[2])
             max_wts[int(split_line[0])] = int(split_line[3])
 
-local_graph = Graph(n)
+local_graph = Graph(n) # graph of routers as observed by this router
 
 port = 10000 + id
 socket_comm = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
