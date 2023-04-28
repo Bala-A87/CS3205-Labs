@@ -1,6 +1,5 @@
 import sys, os, signal
 
-nodes = None            # -n
 infile = None           # -f
 outfile = None          # -o
 hello_interval = 1      # -h
@@ -10,10 +9,7 @@ debug = False           # -d
 
 i = 1
 while i < len(sys.argv):
-    if sys.argv[i] == '-n':
-        nodes = int(sys.argv[i+1])
-        i += 1
-    elif sys.argv[i] == '-f':
+    if sys.argv[i] == '-f':
         infile = sys.argv[i+1]
         i += 1
     elif sys.argv[i] == '-o':
@@ -31,6 +27,11 @@ while i < len(sys.argv):
     elif sys.argv[i] == '-d':
         debug = True
     i += 1
+
+with open(infile, 'r') as f:
+    for line in f:
+        nodes = int(line.split(' ')[0])
+        break
 
 children = []
 for node in range(nodes):
